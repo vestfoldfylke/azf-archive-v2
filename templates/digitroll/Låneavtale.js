@@ -28,15 +28,15 @@ module.exports = {
             Category: '1',
             Format: 'PDF',
             Status: 'F',
-            Title: 'Avtale om lån av bærbar-PC nettbrett og lån av gratis læremidler (signert) ',
+            Title: 'Avtale om lån av bærbar PC nettbrett og lån av gratis læremidler - Signert',
             VersionFormat: archiveData.versionFormat
           }
         ],
         Paragraph: 'Offl. § 26 femte ledd',
         ResponsibleEnterpriseNumber: archiveData.schoolOrgnr,
         Status: 'J',
-        Title: 'Avtale om lån av bærbar-PC nettbrett og lån av gratis læremidler (signert)',
-        UnofficialTitle: `Avtale om lån av bærbar-PC nettbrett og lån av gratis læremidler (signert) - ${archiveData.studentName}`
+        Title: 'Avtale om lån av bærbar PC/nettbrett og lån av gratis læremidler - Signert',
+        UnofficialTitle: `Avtale om lån av bærbar PC/nettbrett og lån av gratis læremidler - Signert - ${archiveData.studentName}`
       }
     }
   },
