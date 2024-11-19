@@ -7,7 +7,7 @@ module.exports = {
         AccessCode: '26',
         AccessCodeDescription: 'Offl. § 26 femte ledd (unntak for fødselsnr og nummer med tilsvarende funksjon)',
         AccessGroup: archiveData.accessGroup,
-        Archive: 'Saksdokument',
+        Archive: 'Elevdokument',
         CaseNumber: archiveData.caseNumber,
         Category: 'Dokument inn',
         Contacts: [
