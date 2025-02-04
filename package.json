@@ -2,7 +2,6 @@
   "name": "azf-archive-v2",
   "version": "1.0.10",
   "description": "Azure function for archive operations in P360 (version 2)",
-  "main": "index.js",
   "scripts": {
     "test": "standard && jest",
     "test:verbose": "jest --verbose",
@@ -34,7 +33,7 @@
   },
   "homepage": "https://github.com/vtfk/azf-archive#readme",
   "dependencies": {
-    "@azure/msal-node": "^1.16.0",
+    "@azure/msal-node": "^3.2.0",
     "@vtfk/logger": "^6.0.1",
     "axios": "^1.6.2",
     "jsonwebtoken": "^9.0.0",
