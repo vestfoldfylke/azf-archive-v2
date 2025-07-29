@@ -1,5 +1,6 @@
 const { repackAddress } = require('../lib/repack-brreg-result')
-describe('repackAdress returns as expected when', () => {
+
+describe('repackAddress returns as expected when', () => {
   test('address has one element and is string', () => {
     const addressList = ['gata 4']
     const repackedAddress = repackAddress(addressList)

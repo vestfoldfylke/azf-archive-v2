@@ -1,0 +1,62 @@
+{
+  "organisasjonsnummer": "010101010",
+  "navn": "Rektalprolapsforeningen",
+  "organisasjonsform": {
+    "kode": "AS",
+    "beskrivelse": "Aksjeselskap",
+    "_links": {
+      "self": {
+        "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/AS"
+      }
+    }
+  },
+  "hjemmeside": "www.rektalprolapsforeningen.no",
+  "registreringsdatoEnhetsregisteret": "2001-04-22",
+  "registrertIMvaregisteret": true,
+  "naeringskode1": {
+    "kode": "69.69",
+    "beskrivelse": "Prolaps og andre merkverdige forhold"
+  },
+  "antallAnsatte": 0.25,
+  "harRegistrertAntallAnsatte": true,
+  "registreringsdatoMerverdiavgiftsregisteret": "2001-04-22",
+  "registreringsdatoMerverdiavgiftsregisteretEnhetsregisteret": "2001-04-22",
+  "registreringsdatoAntallAnsatteEnhetsregisteret": "2001-04-22",
+  "registreringsdatoAntallAnsatteNAVAaregisteret": "2001-04-22",
+  "epostadresse": "post@rektalprolapsforeningen.no",
+  "telefon": "Jada",
+  "mobil": "Jepp",
+  "stiftelsesdato": "2001-04-22",
+  "institusjonellSektorkode": {
+    "kode": "2000",
+    "beskrivelse": "Private merkverdige foretak"
+  },
+  "registrertIForetaksregisteret": true,
+  "registrertIStiftelsesregisteret": false,
+  "registrertIFrivillighetsregisteret": false,
+  "sisteInnsendteAarsregnskap": "2059",
+  "konkurs": false,
+  "underAvvikling": false,
+  "underTvangsavviklingEllerTvangsopplosning": false,
+  "maalform": "Bokmål",
+  "vedtektsdato": "2001-04-22",
+  "vedtektsfestetFormaal": [
+    "Salg av rektalprolapsprodukter, samt å drive med",
+    "reklame og markedsføring av",
+    "reklame og markedsføring av rektalprolapsprodukter.",
+    "Rektalprolapsforeningen skal også drive med",
+    "noe."
+  ],
+  "aktivitet": [
+    "Rektalprolapsforeningen skal arbeide for å fremme interessene til alle som er interessert i rektalprolaps."
+  ],
+  "registreringsdatoForetaksregisteret": "2001-04-22",
+  "registrertIPartiregisteret": false,
+  "paategninger": [],
+  "_links": {
+    "self": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/010101010"
+    }
+  },
+  "respons_klasse": "Enhet"
+}
