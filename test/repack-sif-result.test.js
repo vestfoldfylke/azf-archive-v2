@@ -1,10 +1,14 @@
-const { repackSifResult, hasSifError, repackUglySifError } = require('../lib/repack-sif-result')
+const { repackSifResult, hasSifError, repackUglySifError, filterSifResult } = require('../lib/repack-sif-result')
 
 const repacker = (sifResult, options) => {
   if (hasSifError(sifResult)) {
     return { ...repackUglySifError(sifResult), hasError: true }
   }
-  return repackSifResult(sifResult, options)
+  const result = repackSifResult(sifResult)
+  if (options && typeof options === 'object') {
+    return filterSifResult(result, options)
+  }
+  return result
 }
 
 const resultPrivatePerson = repacker({
