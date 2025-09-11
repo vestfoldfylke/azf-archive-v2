@@ -150,6 +150,23 @@ Example
 ```
 Returns 200 OK (if ok 🙃)
 
+#### Options
+Example
+```json
+{
+  "service": "CaseService",
+  "method": "GetCases",
+  "parameter": {
+    "CaseNumber": "12/34567"
+  },
+  "options": {
+    "onlyOpenCases": true, // Only cases with status "Under behandling" - default false
+    "excludeExpiredCases": true, // Exclude cases with status "Utgår"
+    "limit": 10 // Limit response for Get-methods to a given number - default returns everything (can take a long time, as this azure function handles pagination towards p360)
+  }
+}
+```
+
 
 ### SIF documentation
 
