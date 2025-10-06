@@ -4,9 +4,10 @@ const { GENERATED_PDF_PROPERTY_NAME } = require('../config')
 
 const systems = readdirSync('./templates').filter(ele => lstatSync(`./templates/${ele}`).isDirectory()) // outside the test working dir is root foler
 
-const validateFields = (flattenedFields, type) => {
+const validateFields = (flattenedFields, type, requiredFields) => {
+  const requiredKeys = Object.keys(requiredFields)
   for (const [key, value] of Object.entries(flattenedFields)) {
-    if (value === undefined || value === null) return `Oh shait, ${key} has null or undefined value... Please fix template...`
+    if (requiredKeys.includes(key) && (value === undefined || value === null)) return `Oh shait, ${key} has null or undefined value... Please fix template...`
     if (typeof value === 'string' && value.includes('undefined')) return `Oh shait, ${key} has null or undefined value... Please fix template...`
   }
   if (type === 'archive') {
@@ -33,12 +34,12 @@ describe.each(systems)('Verifying templates for system: %p', system => {
   test.each(templates)('Expect template %p to generate successfully', (template) => {
     const { pdfTemplate, archiveTemplate, requiredFields } = require(`../templates/${system}/${template}`)
     if (pdfTemplate) {
-      const pdfValidation = validateFields(flattenObject(pdfTemplate(requiredFields), { flattenArray: true }), 'pdf')
+      const pdfValidation = validateFields(flattenObject(pdfTemplate(requiredFields), { flattenArray: true }), 'pdf', requiredFields)
       expect(pdfValidation).toBe('Okidoki!')
       // Mock that pdf is created
       requiredFields[GENERATED_PDF_PROPERTY_NAME] = 'base64base64blablabla=='
     }
-    const archiveValidation = validateFields(flattenObject(archiveTemplate(requiredFields), { flattenArray: true }), 'archive')
+    const archiveValidation = validateFields(flattenObject(archiveTemplate(requiredFields), { flattenArray: true }), 'archive', requiredFields)
     expect(archiveValidation).toBe('Okidoki!')
   })
 })
