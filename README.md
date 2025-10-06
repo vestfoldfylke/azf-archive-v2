@@ -175,7 +175,7 @@ Latest **SIF documentation** as well as **release notes** can be found [here](ht
 ### ```POST /SyncPrivatePerson```
 - Creates **PrivatePerson** on person if one doesn't exist on given identifier, updates the existing PrivatePerson if "forceUpdate" is true. Returns the privatePerson.
 
-If needed, fetches person info from [Folkeregisteret](https://github.com/vtfk/azf-freg)
+If needed, fetches person info from [Folkeregisteret](https://github.com/vestfoldfylke/azf-freg) and contact info from [KRR](https://github.com/vestfoldfylke/azf-freg)
 
 #### `With ssn as parameter`
 ```json
@@ -207,7 +207,9 @@ Either uses the **PrivatePerson** with the provided data if person exists on the
   "lastName": "Son",
   "streetAddress": "Gamlehjemmet 44",
   "zipCode": "1234",
-  "zipPlace": "Jupiter"
+  "zipPlace": "Jupiter",
+  "email": "per@son.no", // Optional
+  "phoneNumber": "+47 12345678" // Optional, use whitespace between country code and phonenumber for it to display correct in 360 GUI
 }
 ```
 #### `Optional: Use manually provided data instead of FREG data)`
@@ -221,6 +223,8 @@ Either updates the **PrivatePerson** with FREG data if person exists on identifi
   "streetAddress": "Gamlehjemmet 44",
   "zipCode": "1234",
   "zipPlace": "Jupiter",
+  "email": "per@son.no", // Optional
+  "phoneNumber": "+47 12345678", // Optional, use whitespace between country code and phonenumber for it to display correct in 360 GUI
   "manualData": true
 }
 ```
@@ -233,12 +237,14 @@ Either updates the **PrivatePerson** with FREG data if person exists on identifi
   "streetAddress": "Gamlehjemmet 44",
   "zipCode": "1234",
   "zipPlace": "Jupiter",
+  "email": "per@son.no", // Optional
+  "phoneNumber": "+47 12345678", // Optional, use whitespace between country code and phonenumber for it to display correct in 360 GUI
   "manualData": true
 }
 ```
 
 #### `Optional: Force update of PrivatePerson even if it alreday exists (if you want to make sure it is updated with latest or provided data)`
-Either updates the **PrivatePerson** with FREG data if person exists on identifier, or creates new **PrivatePerson** with the provided data
+Either updates the **PrivatePerson** with FREG data and KRR data if person exists on identifier, or creates new **PrivatePerson** with the provided data
 ```json
 {
   "ssn": "12345678910",
@@ -264,6 +270,8 @@ Either updates the **PrivatePerson** with FREG data if person exists on identifi
   "streetAddress": "Gamlehjemmet 44",
   "zipCode": "1234",
   "zipPlace": "Jupiter",
+  "email": "per@son.no", // Optional
+  "phoneNumber": "+47 12345678", // Optional, use whitespace between country code and phonenumber for it to display correct in 360 GUI
   "forceUpdate": true
 }
 ```
@@ -276,6 +284,8 @@ Either updates the **PrivatePerson** with FREG data if person exists on identifi
   "streetAddress": "Gamlehjemmet 44",
   "zipCode": "1234",
   "zipPlace": "Jupiter",
+  "email": "per@son.no", // Optional
+  "phoneNumber": "+47 12345678", // Optional, use whitespace between country code and phonenumber for it to display correct in 360 GUI
   "forceUpdate": true,
   "manualData": true
 }
@@ -289,6 +299,8 @@ Either updates the **PrivatePerson** with FREG data if person exists on identifi
   "streetAddress": "Gamlehjemmet 44",
   "zipCode": "1234",
   "zipPlace": "Jupiter",
+  "email": "per@son.no", // Optional
+  "phoneNumber": "+47 12345678", // Optional, use whitespace between country code and phonenumber for it to display correct in 360 GUI
   "forceUpdate": true,
   "manualData": true
 }
@@ -312,7 +324,7 @@ Fetches company info from [Brønnøysundregisteret]https://www.brreg.no/)
 - Creates **PrivatePerson** on person if one doesn't exist on given identifier, updates the existing PrivatePerson if "forceUpdate" is true.
 - Creates **Elevmappe** on person if elevmappe doesn't exist on given PrivatePerson, updates the Elevmappe if it does not match name or address info on contact. Returns 
 
-If needed, fetches person info from [Folkeregisteret](https://github.com/vtfk/azf-freg)
+If needed, fetches person info from [Folkeregisteret](https://github.com/vestfoldfylke/azf-freg) and [KRR](https://github.com/vestfoldfylke/azf-krr)
 
 #### `With ssn as parameter`
 ```json
@@ -344,7 +356,9 @@ Either uses the **PrivatePerson** with the provided data if person exists on the
   "lastName": "Son",
   "streetAddress": "Gamlehjemmet 44",
   "zipCode": "1234",
-  "zipPlace": "Jupiter"
+  "zipPlace": "Jupiter",
+  "email": "per@son.no", // Optional
+  "phoneNumber": "+47 12345678" // Optional, use whitespace between country code and phonenumber for it to display correct in 360 GUI
 }
 ```
 #### `Optional: Use manually provided data instead of FREG data)`
@@ -358,6 +372,8 @@ Either updates the **PrivatePerson** with FREG data if person exists on identifi
   "streetAddress": "Gamlehjemmet 44",
   "zipCode": "1234",
   "zipPlace": "Jupiter",
+  "email": "per@son.no", // Optional
+  "phoneNumber": "+47 12345678", // Optional, use whitespace between country code and phonenumber for it to display correct in 360 GUI
   "manualData": true
 }
 ```
@@ -370,6 +386,8 @@ Either updates the **PrivatePerson** with FREG data if person exists on identifi
   "streetAddress": "Gamlehjemmet 44",
   "zipCode": "1234",
   "zipPlace": "Jupiter",
+  "email": "per@son.no", // Optional
+  "phoneNumber": "+47 12345678", // Optional, use whitespace between country code and phonenumber for it to display correct in 360 GUI
   "manualData": true
 }
 ```
@@ -401,6 +419,8 @@ Either updates the **PrivatePerson** with FREG data if person exists on identifi
   "streetAddress": "Gamlehjemmet 44",
   "zipCode": "1234",
   "zipPlace": "Jupiter",
+  "email": "per@son.no", // Optional
+  "phoneNumber": "+47 12345678", // Optional, use whitespace between country code and phonenumber for it to display correct in 360 GUI
   "forceUpdate": true
 }
 ```
@@ -413,6 +433,8 @@ Either updates the **PrivatePerson** with FREG data if person exists on identifi
   "streetAddress": "Gamlehjemmet 44",
   "zipCode": "1234",
   "zipPlace": "Jupiter",
+  "email": "per@son.no", // Optional
+  "phoneNumber": "+47 12345678", // Optional, use whitespace between country code and phonenumber for it to display correct in 360 GUI
   "forceUpdate": true,
   "manualData": true
 }
@@ -426,6 +448,8 @@ Either updates the **PrivatePerson** with FREG data if person exists on identifi
   "streetAddress": "Gamlehjemmet 44",
   "zipCode": "1234",
   "zipPlace": "Jupiter",
+  "email": "per@son.no", // Optional
+  "phoneNumber": "+47 12345678", // Optional, use whitespace between country code and phonenumber for it to display correct in 360 GUI
   "forceUpdate": true,
   "manualData": true
 }
@@ -470,6 +494,8 @@ Fetches person info from [FINTFOLK-API](https://github.com/vtfk/azf-fintfolk-api
 		"zipCode": "1234",
 		"zipPlace": "Drømmeland",
 		"addressProtection": false,
+    "email": "shrek@sump.no",
+    "phoneNumber": "+47 12345678",
 		"recno": 200451,
 		"updated": false,
 		"created": false
@@ -563,6 +589,8 @@ All templates are found in [the templates folder](./templates/)
       "FREG_URL": "url to freg api",
       "FREG_SCOPE": "scope for freg api",
       "BRREG_URL": "url to brreg api",
+      "KRR_URL": "url to azf krr api - full path",
+      "KRR_API_KEY": "api key for azf krr api",
       "ACCESSGROUP_EXCEPTIONS": "spør en voksen",
       "COUNTY_NUMBER": "fylkesnummer"
     }
