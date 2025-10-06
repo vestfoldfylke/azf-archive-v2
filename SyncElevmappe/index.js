@@ -37,7 +37,7 @@ module.exports = async (context, req) => {
   }
 
   // Below, we see valid input properties in body
-  const { ssn, name, firstName, lastName, birthdate, fakeSsn, gender, streetAddress, zipCode, zipPlace, forceUpdate, manualData } = req.body
+  const { ssn, name, firstName, lastName, birthdate, fakeSsn, gender, streetAddress, zipCode, zipPlace, email, phoneNumber, forceUpdate, manualData } = req.body
   const nameObj = getName(name, firstName, lastName) // Name can be either "name" or "firstName and lastName", so we make sure it we have them all further on
   const syncPrivatePersonData = {
     ssn,
@@ -50,6 +50,8 @@ module.exports = async (context, req) => {
     streetAddress,
     zipCode,
     zipPlace,
+    email,
+    phoneNumber,
     forceUpdate,
     manualData
   }

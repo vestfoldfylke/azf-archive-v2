@@ -12,7 +12,9 @@ module.exports = {
           ZipCode: archiveData.zipCode,
           ZipPlace: archiveData.zipPlace,
           Country: 'NOR'
-        }
+        },
+        Email: archiveData.email,
+        PhoneNumber: archiveData.phoneNumber
       }
     }
   },
