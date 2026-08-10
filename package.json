@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/vtfk/azf-archive#readme",
   "dependencies": {
-    "@azure/msal-node": "^3.8.10",
+    "@azure/msal-node": "^5.5.0",
     "@vtfk/logger": "^6.4.2",
     "axios": "^1.13.6",
     "jsonwebtoken": "^9.0.3",
