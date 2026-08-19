@@ -1,0 +1,11 @@
+**/*.ts
+local.settings.json
+biome.json
+tsconfig.json
+.claude
+.git*
+.vscode
+.idea
+/test
+package-lock.json
+LICENSE
