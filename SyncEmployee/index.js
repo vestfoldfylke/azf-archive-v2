@@ -1,4 +1,4 @@
-const { logConfig, logger } = require("@vtfk/logger");
+const { logger } = require("@vestfoldfylke/loglady");
 const { ARCHIVE_ROLE } = require("../config.js");
 const { httpResponse } = require("../lib/http-response.js");
 const { decodeAccessToken } = require("../lib/decode-access-token.js");
@@ -7,33 +7,33 @@ const { callFintfolk } = require("../lib/fintfolk.js");
 const { syncEmployee } = require("../lib/archive/sync-employee.js");
 
 module.exports = async (context, req) => {
-  logConfig({
+  logger.logConfig({
     prefix: "SyncEmployee"
   });
   // Verify token
   const decoded = decodeAccessToken(req.headers.authorization);
 
   if (!decoded.verified) {
-    logger("warn", ["Token is not valid", decoded.msg], context);
+    logger.warn(`Token is not valid - ${decoded.msg}`);
     return httpResponse(401, decoded.msg);
   }
 
-  logger("info", ["Validating role"], context);
+  logger.info("Validating role");
   if (!decoded.roles.includes(ARCHIVE_ROLE)) {
-    logger("info", ["Missing required role for access"], context);
+    logger.info("Missing required role for access");
     return httpResponse(403, "Missing required role for access");
   }
 
-  logConfig({
+  logger.logConfig({
     prefix: `SyncEmployee - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`
   });
 
-  logger("info", ["Role validated"], context);
+  logger.info("Role validated");
 
   // Input validation
   if (!req.body) {
     const msg = "Please pass a request body";
-    logger("error", msg, context);
+    logger.error(msg);
     return httpResponse(400, msg);
   }
 
@@ -41,7 +41,7 @@ module.exports = async (context, req) => {
   const { ssn, ansattnummer, upn, forceUpdate, manualManagerEmail } = req.body;
 
   if (!ssn && !ansattnummer && !upn) {
-    logger("info", ['Missing required parameter "ssn" or "ansattnummer" or "upn"'], context);
+    logger.info('Missing required parameter "ssn" or "ansattnummer" or "upn"');
     return httpResponse(400, 'Missing required parameter "ssn" or "ansattnummer" or "upn"');
   }
 
@@ -54,17 +54,17 @@ module.exports = async (context, req) => {
   } else if (upn) {
     resourceUrl = `employee/upn/${upn}`;
   } else {
-    logger("info", ['WHAAT hit should we not arrive... Missing required parameter "ssn" or "ansattnummer" or "upn"'], context);
+    logger.info('WHAAT hit should we not arrive... Missing required parameter "ssn" or "ansattnummer" or "upn"');
     return httpResponse(400, 'WHAAT hit should we not arrive... Missing required parameter "ssn" or "ansattnummer" or "upn"');
   }
 
   let fintfolkEmployee;
   try {
-    logger("info", ["Calling fintfolk"], context);
+    logger.info("Calling fintfolk");
     fintfolkEmployee = await callFintfolk(resourceUrl);
-    logger("info", ["Succesfully got response from fintfolk"], context);
+    logger.info("Succesfully got response from fintfolk");
   } catch (error) {
-    logger("error", ["error when calling fintfolk", error.response?.data || error.stack || error.toString()], context);
+    logger.error(`error when calling fintfolk - ${error.response?.data || error.stack || error.toString()}`);
     return httpResponse(500, error);
   }
 
@@ -75,22 +75,22 @@ module.exports = async (context, req) => {
 
   let privatePerson;
   try {
-    logger("info", ["Syncing PrivatePerson"], context);
+    logger.info("Syncing PrivatePerson");
     getSyncPrivatePersonMethod(syncPrivatePersonData); // Throws error if we do not have a valid combination of parameters
     privatePerson = await syncPrivatePerson(syncPrivatePersonData, context);
-    logger("info", ["Succesfully synced PrivatePerson"], context);
+    logger.info("Succesfully synced PrivatePerson");
   } catch (error) {
-    logger("error", ["error when syncing privatePerson", error.response?.data || error.stack || error.toString()], context);
+    logger.error(`error when syncing privatePerson - ${error.response?.data || error.stack || error.toString()}`);
     return httpResponse(500, error);
   }
 
   try {
-    logger("info", ["Syncing employee"], context);
+    logger.info("Syncing employee");
     const { responsibleEnterprise, archiveManager } = await syncEmployee(privatePerson, fintfolkEmployee, manualManagerEmail, context);
-    logger("info", ["Succesfully synced employee"], context);
+    logger.info("Succesfully synced employee");
     return httpResponse(200, { privatePerson, archiveManager, responsibleEnterprise });
   } catch (error) {
-    logger("error", ["error when syncing employee", error.response?.data || error.stack || error.toString()], context);
+    logger.error(`error when syncing employee - ${error.response?.data || error.stack || error.toString()}`);
     return httpResponse(500, error);
   }
 };

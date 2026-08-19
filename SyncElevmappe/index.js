@@ -1,4 +1,4 @@
-const { logConfig, logger } = require("@vtfk/logger");
+const { logger } = require("@vestfoldfylke/loglady");
 const { ARCHIVE_ROLE } = require("../config.js");
 const { httpResponse } = require("../lib/http-response.js");
 const { decodeAccessToken } = require("../lib/decode-access-token.js");
@@ -6,33 +6,33 @@ const { syncPrivatePerson, getSyncPrivatePersonMethod, getName } = require("../l
 const { syncElevmappe } = require("../lib/archive/sync-elevmappe.js");
 
 module.exports = async (context, req) => {
-  logConfig({
+  logger.logConfig({
     prefix: "SyncElevmappe"
   });
   // Verify token
   const decoded = decodeAccessToken(req.headers.authorization);
 
   if (!decoded.verified) {
-    logger("warn", ["Token is not valid", decoded.msg], context);
+    logger.warn(`Token is not valid - ${decoded.msg}`);
     return httpResponse(401, decoded.msg);
   }
 
-  logger("info", ["Validating role"], context);
+  logger.info("Validating role");
   if (!decoded.roles.includes(ARCHIVE_ROLE)) {
-    logger("info", ["Missing required role for access"], context);
+    logger.info("Missing required role for access");
     return httpResponse(403, "Missing required role for access");
   }
 
-  logConfig({
+  logger.logConfig({
     prefix: `SyncElevmappe - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`
   });
 
-  logger("info", ["Role validated"], context);
+  logger.info("Role validated");
 
   // Input validation
   if (!req.body) {
     const msg = "Please pass a request body";
-    logger("error", msg, context);
+    logger.error(msg);
     return httpResponse(400, msg);
   }
 
@@ -58,22 +58,22 @@ module.exports = async (context, req) => {
 
   let privatePerson;
   try {
-    logger("info", ["Syncing PrivatePerson"], context);
+    logger.info("Syncing PrivatePerson");
     getSyncPrivatePersonMethod(syncPrivatePersonData); // Throws error if we do not have a valid combination of parameters
     privatePerson = await syncPrivatePerson(syncPrivatePersonData, context);
-    logger("info", ["Succesfully synced PrivatePerson"], context);
+    logger.info("Succesfully synced PrivatePerson");
   } catch (error) {
-    logger("error", ["error when syncing privatePerson", error.response?.data || error.stack || error.toString()], context);
+    logger.error(`error when syncing privatePerson - ${error.response?.data || error.stack || error.toString()}`);
     return httpResponse(500, error);
   }
 
   try {
-    logger("info", ["Syncing elevmappe"], context);
+    logger.info("Syncing elevmappe");
     const elevmappe = await syncElevmappe(privatePerson, context);
-    logger("info", ["Succesfully synced elevmappe"], context);
+    logger.info("Succesfully synced elevmappe");
     return httpResponse(200, { privatePerson, elevmappe });
   } catch (error) {
-    logger("error", ["error when syncing elevmappe", error.response?.data || error.stack || error.toString()], context);
+    logger.error(`error when syncing elevmappe - ${error.response?.data || error.stack || error.toString()}`);
     return httpResponse(500, error);
   }
 };

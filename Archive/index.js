@@ -1,4 +1,4 @@
-const { logConfig, logger } = require("@vtfk/logger");
+const { logger } = require("@vestfoldfylke/loglady");
 const callArchive = require("../lib/call-archive.js");
 const callArchiveTemplate = require("../lib/call-archive-template.js");
 const { ARCHIVE_ROLE } = require("../config.js");
@@ -6,46 +6,46 @@ const { httpResponse } = require("../lib/http-response.js");
 const { decodeAccessToken } = require("../lib/decode-access-token.js");
 
 module.exports = async (context, req) => {
-  logConfig({
+  logger.logConfig({
     prefix: "Archive"
   });
   // Verify token
   const decoded = decodeAccessToken(req.headers.authorization);
 
   if (!decoded.verified) {
-    logger("warn", ["Token is not valid", decoded.msg], context);
+    logger.warn(`Token is not valid - ${decoded.msg}`);
     return httpResponse(401, decoded.msg);
   }
 
-  logger("info", ["Validating role"], context);
+  logger.info("Validating role");
   if (!decoded.roles.includes(ARCHIVE_ROLE)) {
-    logger("info", ["Missing required role for access"], context);
+    logger.info("Missing required role for access");
     return httpResponse(403, "Missing required role for access");
   }
 
-  logConfig({
+  logger.logConfig({
     prefix: `Archive - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`
   });
 
-  logger("info", ["Role validated"], context);
+  logger.info("Role validated");
 
   // Input validation
   if (!req.body) {
     const msg = "Please pass a request body";
-    logger("error", msg, context);
+    logger.error(msg);
     return httpResponse(400, msg);
   }
 
   const { service, method, system, template, parameter, demoRun, getExample, options } = req.body;
   if (!parameter) {
     const msg = 'Missing required parameter "parameter"';
-    logger("error", msg, context);
+    logger.error(msg);
     return httpResponse(400, msg);
   }
   // Either (service and method) or (system and template) is required
   if (!(service && method) && !(system, template)) {
     const msg = 'Missing required parameter combination ("service" and "method") or ("system" and "template")';
-    logger("error", msg, context);
+    logger.error(msg);
     return httpResponse(400, msg);
   }
 
@@ -54,7 +54,7 @@ module.exports = async (context, req) => {
     JSON.parse(JSON.stringify(parameter));
   } catch (_error) {
     const msg = 'Parameter "parameter" must be valid json!';
-    logger("error", msg, context);
+    logger.error(msg);
     return httpResponse(400, msg);
   }
   // Validate that options is valid json if exists
@@ -62,12 +62,12 @@ module.exports = async (context, req) => {
     if (options) JSON.parse(JSON.stringify(options));
   } catch (_error) {
     const msg = 'Parameter "options" must be valid json!';
-    logger("error", msg, context);
+    logger.error(msg);
     return httpResponse(400, msg);
   }
 
   // Finished validation - we have valid role, either service, method, or system and template
-  logConfig({
+  logger.logConfig({
     prefix: `Archive - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""} - ${service || system} - ${method || template}`
   });
 
@@ -77,7 +77,7 @@ module.exports = async (context, req) => {
       const archiveResult = await callArchive({ service, method, parameter, options }, context);
       return httpResponse(200, archiveResult);
     } catch (error) {
-      logger("error", ["Raw archive call failed", error.response?.data || error.stack || error.toString()], context);
+      logger.error(`Raw archive call failed - ${error.response?.data || error.stack || error.toString()}`);
       return httpResponse(500, error); // 500 is fallback status code
     }
   }
@@ -88,7 +88,7 @@ module.exports = async (context, req) => {
       const templateResult = await callArchiveTemplate({ system, template, parameter, getExample, demoRun }, context);
       return httpResponse(200, templateResult);
     } catch (error) {
-      logger("error", ["Template archive call failed", error.response?.data || error.stack || error.toString()], context);
+      logger.error(`Template archive call failed - ${error.response?.data || error.stack || error.toString()}`);
       return httpResponse(500, error);
     }
   }
