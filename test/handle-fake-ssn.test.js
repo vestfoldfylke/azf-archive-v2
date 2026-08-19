@@ -1,3 +1,5 @@
+const { describe, test } = require("node:test");
+const assert = require("node:assert/strict");
 const { COUNTY_NUMBER } = require("../config.js");
 const { newFakeSsn } = require("../lib/handle-fake-ssn.js");
 
@@ -16,10 +18,10 @@ const womanAfter2000 = {
 describe("New fake ssn is generated as expected", () => {
   test("When subject is man born before 2000, running number is two digits", () => {
     const fakeSsn = newFakeSsn(manBefore2000.birthdate, manBefore2000.gender, manBefore2000.runningNumber);
-    expect(fakeSsn).toBe(`690193991${COUNTY_NUMBER}`);
+    assert.equal(fakeSsn, `690193991${COUNTY_NUMBER}`);
   });
   test("When subject is woman born after 2000, running number is one digit", () => {
     const fakeSsn = newFakeSsn(womanAfter2000.birthdate, womanAfter2000.gender, womanAfter2000.runningNumber);
-    expect(fakeSsn).toBe(`421002042${COUNTY_NUMBER}`);
+    assert.equal(fakeSsn, `421002042${COUNTY_NUMBER}`);
   });
 });

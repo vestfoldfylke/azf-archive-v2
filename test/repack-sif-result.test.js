@@ -1,3 +1,5 @@
+const { test } = require("node:test");
+const assert = require("node:assert/strict");
 const { repackSifResult, hasSifError, repackUglySifError, filterSifResult } = require("../lib/repack-sif-result.js");
 
 const repacker = (sifResult, options) => {
@@ -219,95 +221,94 @@ const resultPrivatePersonWithEmptyResponse = repacker({
 });
 
 test("PrivatePerson result is Array", () => {
-  expect(Array.isArray(resultPrivatePerson)).toBe(true);
+  assert.equal(Array.isArray(resultPrivatePerson), true);
 });
 
 test("PrivatePerson result has one item only", () => {
-  expect(Object.getOwnPropertyNames(resultPrivatePerson)).toStrictEqual(["0", "length"]);
+  assert.deepEqual(Object.getOwnPropertyNames(resultPrivatePerson), ["0", "length"]);
 });
 
 test('PrivatePerson results one item has a "Recno" property', () => {
-  expect(resultPrivatePerson[0].Recno).toBe(123456);
+  assert.equal(resultPrivatePerson[0].Recno, 123456);
 });
 
 test("PrivatePerson with empty response is array", () => {
-  expect(Array.isArray(resultPrivatePersonWithEmptyResponse)).toBe(true);
+  assert.equal(Array.isArray(resultPrivatePersonWithEmptyResponse), true);
 });
 
 test("PrivatePerson with empty response is empty array", () => {
-  console.log(resultPrivatePersonWithEmptyResponse);
-  expect(resultPrivatePersonWithEmptyResponse.length).toBe(0);
+  assert.equal(resultPrivatePersonWithEmptyResponse.length, 0);
 });
 
 test("CreateCase result is object and has property CaseNumber", () => {
-  expect(typeof resultCreateCase).toBe("object");
-  expect(resultCreateCase.CaseNumber).toBeTruthy();
+  assert.equal(typeof resultCreateCase, "object");
+  assert.ok(resultCreateCase.CaseNumber);
 });
 
 test('CreateCase results one item has a "Recno" and a "CaseNumber" property', () => {
-  expect(resultCreateCase.Recno).toBe(123456);
-  expect(resultCreateCase.CaseNumber).toBe("40/12345");
+  assert.equal(resultCreateCase.Recno, 123456);
+  assert.equal(resultCreateCase.CaseNumber, "40/12345");
 });
 
 test("GetCase result with limit set to 1 is returned as Object", () => {
   const result = repacker(getCase, { limit: 1 });
-  expect(typeof result).toBe("object");
-  expect(result.Recno).toBe(123456);
-  expect(result.CaseNumber).toBe("40/12345");
+  assert.equal(typeof result, "object");
+  assert.equal(result.Recno, 123456);
+  assert.equal(result.CaseNumber, "40/12345");
 });
 
 test("GetCase result with limit set to 2 is returned as Array with 2 items", () => {
   const result = repacker(getCase, { limit: 2 });
-  expect(Array.isArray(result)).toBe(true);
-  expect(result.length).toBe(2);
-  expect(result[0].Recno).toBe(123456);
-  expect(result[0].CaseNumber).toBe("40/12345");
-  expect(result[1].Recno).toBe(123457);
-  expect(result[1].CaseNumber).toBe("40/12346");
+  assert.equal(Array.isArray(result), true);
+  assert.equal(result.length, 2);
+  assert.equal(result[0].Recno, 123456);
+  assert.equal(result[0].CaseNumber, "40/12345");
+  assert.equal(result[1].Recno, 123457);
+  assert.equal(result[1].CaseNumber, "40/12346");
 });
 
 test("GetCase result with limit set to 5 is returned as Array with 3 items", () => {
   const result = repacker(getCase, { limit: 5 });
-  expect(Array.isArray(result)).toBe(true);
-  expect(result.length).toBe(3);
-  expect(result[0].Recno).toBe(123456);
-  expect(result[0].CaseNumber).toBe("40/12345");
-  expect(result[1].Recno).toBe(123457);
-  expect(result[1].CaseNumber).toBe("40/12346");
-  expect(result[2].Recno).toBe(123458);
-  expect(result[2].CaseNumber).toBe("40/12347");
+  assert.equal(Array.isArray(result), true);
+  assert.equal(result.length, 3);
+  assert.equal(result[0].Recno, 123456);
+  assert.equal(result[0].CaseNumber, "40/12345");
+  assert.equal(result[1].Recno, 123457);
+  assert.equal(result[1].CaseNumber, "40/12346");
+  assert.equal(result[2].Recno, 123458);
+  assert.equal(result[2].CaseNumber, "40/12347");
 });
 
 test("GetCase result with limit not set is returned as Array with 3 items", () => {
   const result = repacker(getCase);
-  expect(Array.isArray(result)).toBe(true);
-  expect(result.length).toBe(3);
-  expect(result[0].Recno).toBe(123456);
-  expect(result[0].CaseNumber).toBe("40/12345");
-  expect(result[1].Recno).toBe(123457);
-  expect(result[1].CaseNumber).toBe("40/12346");
-  expect(result[2].Recno).toBe(123458);
-  expect(result[2].CaseNumber).toBe("40/12347");
+  assert.equal(Array.isArray(result), true);
+  assert.equal(result.length, 3);
+  assert.equal(result[0].Recno, 123456);
+  assert.equal(result[0].CaseNumber, "40/12345");
+  assert.equal(result[1].Recno, 123457);
+  assert.equal(result[1].CaseNumber, "40/12346");
+  assert.equal(result[2].Recno, 123458);
+  assert.equal(result[2].CaseNumber, "40/12347");
 });
 
 test("CreateCase result with ErrorMessage is Object", () => {
-  expect(typeof resultCreateCaseWithErrorMessage).toBe("object");
+  assert.equal(typeof resultCreateCaseWithErrorMessage, "object");
 });
 
 test("CreateCase result with ErrorMessage is caught as error", () => {
-  expect(resultCreateCaseWithErrorMessage.hasError).toBe(true);
+  assert.equal(resultCreateCaseWithErrorMessage.hasError, true);
 });
 
 test('CreateCase result with ErrorMessage has a "ErrorMessage" property', () => {
-  expect(typeof resultCreateCaseWithErrorMessage.ErrorMessage).toBe("string");
-  expect(resultCreateCaseWithErrorMessage.ErrorMessage).toBe("Error occured in the mainframe :-O");
+  assert.equal(typeof resultCreateCaseWithErrorMessage.ErrorMessage, "string");
+  assert.equal(resultCreateCaseWithErrorMessage.ErrorMessage, "Error occured in the mainframe :-O");
 });
 
 test('CreateCase result with ErrorMessage newline do not have "ErrorMessage" property', () => {
-  expect(typeof resultCreateCaseWithWeirdErrorMessage.error).toBe("undefined");
+  assert.equal(typeof resultCreateCaseWithWeirdErrorMessage.error, "undefined");
 });
 
 test("CreateCase result with ErrorMessage from P360 do not have quotes inside", () => {
-  expect(resultCreateCaseWithErrorMessageFromP360.ErrorMessage.indexOf('"')).toBe(-1);
-  expect(resultCreateCaseWithErrorMessageFromP360.ErrorMessage.indexOf("'")).toBe(-1);
+  assert.equal(resultCreateCaseWithErrorMessageFromP360.ErrorMessage.indexOf('"'), -1);
+  assert.equal(resultCreateCaseWithErrorMessageFromP360.ErrorMessage.indexOf("'"), -1);
 });

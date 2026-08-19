@@ -1,3 +1,5 @@
+const { describe, test } = require("node:test");
+const assert = require("node:assert/strict");
 const { repackBrreg } = require("../lib/repack-brreg-result.js");
 // biome-ignore lint/correctness/useImportExtensions: json file requires the .json extension
 const data = require("./data/brreg-data.json");
@@ -19,18 +21,18 @@ describe("repackBrreg returns as expected when", () => {
       forretningsadresse: addressFields
     };
     const repackedEnterprise = repackBrreg(enterprise);
-    expect(repackedEnterprise.Name).toBe(data.navn);
-    expect(repackedEnterprise.EnterpriseNumber).toBe(data.organisasjonsnummer);
-    expect(repackedEnterprise.PostAddress.StreetAddress).toBe(addressFields.adresse[0]);
-    expect(repackedEnterprise.PostAddress.ZipCode).toBe(addressFields.postnummer);
-    expect(repackedEnterprise.PostAddress.ZipPlace).toBe(addressFields.poststed);
-    expect(repackedEnterprise.PostAddress.Country).toBe(addressFields.land);
-    expect(repackedEnterprise.PostAddress.County).toBe(addressFields.kommune);
-    expect(repackedEnterprise.OfficeAddress.StreetAddress).toBe(addressFields.adresse[0]);
-    expect(repackedEnterprise.OfficeAddress.ZipCode).toBe(addressFields.postnummer);
-    expect(repackedEnterprise.OfficeAddress.ZipPlace).toBe(addressFields.poststed);
-    expect(repackedEnterprise.OfficeAddress.Country).toBe(addressFields.land);
-    expect(repackedEnterprise.OfficeAddress.County).toBe(addressFields.kommune);
+    assert.equal(repackedEnterprise.Name, data.navn);
+    assert.equal(repackedEnterprise.EnterpriseNumber, data.organisasjonsnummer);
+    assert.equal(repackedEnterprise.PostAddress.StreetAddress, addressFields.adresse[0]);
+    assert.equal(repackedEnterprise.PostAddress.ZipCode, addressFields.postnummer);
+    assert.equal(repackedEnterprise.PostAddress.ZipPlace, addressFields.poststed);
+    assert.equal(repackedEnterprise.PostAddress.Country, addressFields.land);
+    assert.equal(repackedEnterprise.PostAddress.County, addressFields.kommune);
+    assert.equal(repackedEnterprise.OfficeAddress.StreetAddress, addressFields.adresse[0]);
+    assert.equal(repackedEnterprise.OfficeAddress.ZipCode, addressFields.postnummer);
+    assert.equal(repackedEnterprise.OfficeAddress.ZipPlace, addressFields.poststed);
+    assert.equal(repackedEnterprise.OfficeAddress.Country, addressFields.land);
+    assert.equal(repackedEnterprise.OfficeAddress.County, addressFields.kommune);
   });
 
   test("enterprise is active and has an beliggenhetsadresse", () => {
@@ -39,18 +41,18 @@ describe("repackBrreg returns as expected when", () => {
       beliggenhetsadresse: addressFields
     };
     const repackedEnterprise = repackBrreg(enterprise);
-    expect(repackedEnterprise.Name).toBe(data.navn);
-    expect(repackedEnterprise.EnterpriseNumber).toBe(data.organisasjonsnummer);
-    expect(repackedEnterprise.PostAddress.StreetAddress).toBe(addressFields.adresse[0]);
-    expect(repackedEnterprise.PostAddress.ZipCode).toBe(addressFields.postnummer);
-    expect(repackedEnterprise.PostAddress.ZipPlace).toBe(addressFields.poststed);
-    expect(repackedEnterprise.PostAddress.Country).toBe(addressFields.land);
-    expect(repackedEnterprise.PostAddress.County).toBe(addressFields.kommune);
-    expect(repackedEnterprise.OfficeAddress.StreetAddress).toBe(addressFields.adresse[0]);
-    expect(repackedEnterprise.OfficeAddress.ZipCode).toBe(addressFields.postnummer);
-    expect(repackedEnterprise.OfficeAddress.ZipPlace).toBe(addressFields.poststed);
-    expect(repackedEnterprise.OfficeAddress.Country).toBe(addressFields.land);
-    expect(repackedEnterprise.OfficeAddress.County).toBe(addressFields.kommune);
+    assert.equal(repackedEnterprise.Name, data.navn);
+    assert.equal(repackedEnterprise.EnterpriseNumber, data.organisasjonsnummer);
+    assert.equal(repackedEnterprise.PostAddress.StreetAddress, addressFields.adresse[0]);
+    assert.equal(repackedEnterprise.PostAddress.ZipCode, addressFields.postnummer);
+    assert.equal(repackedEnterprise.PostAddress.ZipPlace, addressFields.poststed);
+    assert.equal(repackedEnterprise.PostAddress.Country, addressFields.land);
+    assert.equal(repackedEnterprise.PostAddress.County, addressFields.kommune);
+    assert.equal(repackedEnterprise.OfficeAddress.StreetAddress, addressFields.adresse[0]);
+    assert.equal(repackedEnterprise.OfficeAddress.ZipCode, addressFields.postnummer);
+    assert.equal(repackedEnterprise.OfficeAddress.ZipPlace, addressFields.poststed);
+    assert.equal(repackedEnterprise.OfficeAddress.Country, addressFields.land);
+    assert.equal(repackedEnterprise.OfficeAddress.County, addressFields.kommune);
   });
 
   test("enterprise is active and has an postadresse", () => {
@@ -59,18 +61,18 @@ describe("repackBrreg returns as expected when", () => {
       postadresse: addressFields
     };
     const repackedEnterprise = repackBrreg(enterprise);
-    expect(repackedEnterprise.Name).toBe(data.navn);
-    expect(repackedEnterprise.EnterpriseNumber).toBe(data.organisasjonsnummer);
-    expect(repackedEnterprise.PostAddress.StreetAddress).toBe(addressFields.adresse[0]);
-    expect(repackedEnterprise.PostAddress.ZipCode).toBe(addressFields.postnummer);
-    expect(repackedEnterprise.PostAddress.ZipPlace).toBe(addressFields.poststed);
-    expect(repackedEnterprise.PostAddress.Country).toBe(addressFields.land);
-    expect(repackedEnterprise.PostAddress.County).toBe(addressFields.kommune);
-    expect(repackedEnterprise.OfficeAddress.StreetAddress).toBe(addressFields.adresse[0]);
-    expect(repackedEnterprise.OfficeAddress.ZipCode).toBe(addressFields.postnummer);
-    expect(repackedEnterprise.OfficeAddress.ZipPlace).toBe(addressFields.poststed);
-    expect(repackedEnterprise.OfficeAddress.Country).toBe(addressFields.land);
-    expect(repackedEnterprise.OfficeAddress.County).toBe(addressFields.kommune);
+    assert.equal(repackedEnterprise.Name, data.navn);
+    assert.equal(repackedEnterprise.EnterpriseNumber, data.organisasjonsnummer);
+    assert.equal(repackedEnterprise.PostAddress.StreetAddress, addressFields.adresse[0]);
+    assert.equal(repackedEnterprise.PostAddress.ZipCode, addressFields.postnummer);
+    assert.equal(repackedEnterprise.PostAddress.ZipPlace, addressFields.poststed);
+    assert.equal(repackedEnterprise.PostAddress.Country, addressFields.land);
+    assert.equal(repackedEnterprise.PostAddress.County, addressFields.kommune);
+    assert.equal(repackedEnterprise.OfficeAddress.StreetAddress, addressFields.adresse[0]);
+    assert.equal(repackedEnterprise.OfficeAddress.ZipCode, addressFields.postnummer);
+    assert.equal(repackedEnterprise.OfficeAddress.ZipPlace, addressFields.poststed);
+    assert.equal(repackedEnterprise.OfficeAddress.Country, addressFields.land);
+    assert.equal(repackedEnterprise.OfficeAddress.County, addressFields.kommune);
   });
 
   test("enterprise is active and has an forretningsadresse and a separate postadresse", () => {
@@ -89,18 +91,18 @@ describe("repackBrreg returns as expected when", () => {
       postadresse
     };
     const repackedEnterprise = repackBrreg(enterprise);
-    expect(repackedEnterprise.Name).toBe(data.navn);
-    expect(repackedEnterprise.EnterpriseNumber).toBe(data.organisasjonsnummer);
-    expect(repackedEnterprise.PostAddress.StreetAddress).toBe(postadresse.adresse[0]);
-    expect(repackedEnterprise.PostAddress.ZipCode).toBe(postadresse.postnummer);
-    expect(repackedEnterprise.PostAddress.ZipPlace).toBe(postadresse.poststed);
-    expect(repackedEnterprise.PostAddress.Country).toBe(postadresse.land);
-    expect(repackedEnterprise.PostAddress.County).toBe(postadresse.kommune);
-    expect(repackedEnterprise.OfficeAddress.StreetAddress).toBe(addressFields.adresse[0]);
-    expect(repackedEnterprise.OfficeAddress.ZipCode).toBe(addressFields.postnummer);
-    expect(repackedEnterprise.OfficeAddress.ZipPlace).toBe(addressFields.poststed);
-    expect(repackedEnterprise.OfficeAddress.Country).toBe(addressFields.land);
-    expect(repackedEnterprise.OfficeAddress.County).toBe(addressFields.kommune);
+    assert.equal(repackedEnterprise.Name, data.navn);
+    assert.equal(repackedEnterprise.EnterpriseNumber, data.organisasjonsnummer);
+    assert.equal(repackedEnterprise.PostAddress.StreetAddress, postadresse.adresse[0]);
+    assert.equal(repackedEnterprise.PostAddress.ZipCode, postadresse.postnummer);
+    assert.equal(repackedEnterprise.PostAddress.ZipPlace, postadresse.poststed);
+    assert.equal(repackedEnterprise.PostAddress.Country, postadresse.land);
+    assert.equal(repackedEnterprise.PostAddress.County, postadresse.kommune);
+    assert.equal(repackedEnterprise.OfficeAddress.StreetAddress, addressFields.adresse[0]);
+    assert.equal(repackedEnterprise.OfficeAddress.ZipCode, addressFields.postnummer);
+    assert.equal(repackedEnterprise.OfficeAddress.ZipPlace, addressFields.poststed);
+    assert.equal(repackedEnterprise.OfficeAddress.Country, addressFields.land);
+    assert.equal(repackedEnterprise.OfficeAddress.County, addressFields.kommune);
   });
 });
 
@@ -111,7 +113,7 @@ describe("repackBrreg throws an error when", () => {
       respons_klasse: "SlettetEnhet",
       slettedato: "2023-10-01"
     };
-    expect(() => repackBrreg(enterprise)).toThrow(`Enterprise with orgnr ${enterprise.organisasjonsnummer} is deleted in Brreg`);
+    assert.throws(() => repackBrreg(enterprise), { message: `Enterprise with orgnr ${enterprise.organisasjonsnummer} is deleted in Brreg` });
   });
 
   test("enterprise is active but has no postadresse, forretningsadresse or beliggenhetsadresse were found", () => {
@@ -121,6 +123,6 @@ describe("repackBrreg throws an error when", () => {
       forretningsadresse: undefined,
       beliggenhetsadresse: undefined
     };
-    expect(() => repackBrreg(enterprise)).toThrow(`Enterprise with orgnr ${enterprise.organisasjonsnummer} has no registered address`);
+    assert.throws(() => repackBrreg(enterprise), { message: `Enterprise with orgnr ${enterprise.organisasjonsnummer} has no registered address` });
   });
 });
