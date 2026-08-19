@@ -20,7 +20,8 @@
     "rules": {
       "preset": "recommended",
       "suspicious": {
-        "noExplicitAny": "warn"
+        "noExplicitAny": "warn",
+        "noImplicitAnyLet": "off"
       },
       "correctness": {
         "useImportExtensions": {
