@@ -4,6 +4,8 @@ import syncSharePointSite from "../../lib/archive/sync-sharepoint-site.js";
 import HTTPError from "../../lib/http-error.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
+import { updateContext } from "../middleware/async-local-context.js";
+import { logContextHandling } from "../middleware/logcontext-handling.js";
 
 type SharePointBody = {
   siteUrl?: unknown;
@@ -32,14 +34,14 @@ const validateInput = (body: SharePointBody): void => {
 };
 
 const syncSharepointSiteHandler = async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
-  logger.logConfig({ prefix: "SyncSharepointSite", contextId: context.invocationId });
+  updateContext({ prefix: "SyncSharepointSite", contextId: context.invocationId });
 
   const { decoded, errorResponse } = validateAndGetToken(request.headers.get("authorization"));
   if (errorResponse) {
     return errorResponse;
   }
 
-  logger.logConfig({ prefix: `SyncSharepointSite - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`, contextId: context.invocationId });
+  updateContext({ prefix: `SyncSharepointSite - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`, contextId: context.invocationId });
   logger.info("Role validated");
 
   let body: SharePointBody;
@@ -89,5 +91,6 @@ const syncSharepointSiteHandler = async (request: HttpRequest, context: Invocati
 app.http("SyncSharepointSite", {
   authLevel: "anonymous",
   methods: ["POST"],
-  handler: syncSharepointSiteHandler
+  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> =>
+    await logContextHandling(request, context, syncSharepointSiteHandler)
 });

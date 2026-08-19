@@ -3,16 +3,18 @@ import { logger } from "@vestfoldfylke/loglady";
 import { getName, getSyncPrivatePersonMethod, syncPrivatePerson } from "../../lib/archive/sync-private-person.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
+import { updateContext } from "../middleware/async-local-context.js";
+import { logContextHandling } from "../middleware/logcontext-handling.js";
 
 const syncPrivatePersonHandler = async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
-  logger.logConfig({ prefix: "SyncPrivatePerson", contextId: context.invocationId });
+  updateContext({ prefix: "SyncPrivatePerson", contextId: context.invocationId });
 
   const { decoded, errorResponse } = validateAndGetToken(request.headers.get("authorization"));
   if (errorResponse) {
     return errorResponse;
   }
 
-  logger.logConfig({ prefix: `SyncPrivatePerson - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`, contextId: context.invocationId });
+  updateContext({ prefix: `SyncPrivatePerson - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`, contextId: context.invocationId });
   logger.info("Role validated");
 
   let body: Record<string, unknown>;
@@ -67,5 +69,6 @@ const syncPrivatePersonHandler = async (request: HttpRequest, context: Invocatio
 app.http("SyncPrivatePerson", {
   authLevel: "anonymous",
   methods: ["POST"],
-  handler: syncPrivatePersonHandler
+  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> =>
+    await logContextHandling(request, context, syncPrivatePersonHandler)
 });

@@ -4,6 +4,8 @@ import callArchive from "../../lib/call-archive.js";
 import callArchiveTemplate from "../../lib/call-archive-template.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
+import { updateContext } from "../middleware/async-local-context.js";
+import { logContextHandling } from "../middleware/logcontext-handling.js";
 
 type ArchiveBody = {
   service?: string;
@@ -17,14 +19,14 @@ type ArchiveBody = {
 };
 
 const archiveHandler = async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
-  logger.logConfig({ prefix: "Archive", contextId: context.invocationId });
+  updateContext({ prefix: "Archive", contextId: context.invocationId });
 
   const { decoded, errorResponse } = validateAndGetToken(request.headers.get("authorization"));
   if (errorResponse) {
     return errorResponse;
   }
 
-  logger.logConfig({ prefix: `Archive - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`, contextId: context.invocationId });
+  updateContext({ prefix: `Archive - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`, contextId: context.invocationId });
   logger.info("Role validated");
 
   let body: ArchiveBody;
@@ -68,7 +70,7 @@ const archiveHandler = async (request: HttpRequest, context: InvocationContext):
     return httpResponse(400, msg);
   }
 
-  logger.logConfig({
+  updateContext({
     prefix: `Archive - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""} - ${service || system} - ${method || template}`,
     contextId: context.invocationId
   });
@@ -102,5 +104,6 @@ app.http("Archive", {
   authLevel: "anonymous",
   methods: ["POST"],
   route: "archive",
-  handler: archiveHandler
+  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> =>
+    await logContextHandling(request, context, archiveHandler)
 });

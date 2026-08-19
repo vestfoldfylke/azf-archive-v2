@@ -5,16 +5,18 @@ import { getBrregData } from "../../lib/get-brreg-data.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { repackBrreg } from "../../lib/repack-brreg-result.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
+import { updateContext } from "../middleware/async-local-context.js";
+import { logContextHandling } from "../middleware/logcontext-handling.js";
 
 const syncEnterpriseHandler = async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
-  logger.logConfig({ prefix: "SyncEnterprise", contextId: context.invocationId });
+  updateContext({ prefix: "SyncEnterprise", contextId: context.invocationId });
 
   const { decoded, errorResponse } = validateAndGetToken(request.headers.get("authorization"));
   if (errorResponse) {
     return errorResponse;
   }
 
-  logger.logConfig({ prefix: `SyncEnterprise - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`, contextId: context.invocationId });
+  updateContext({ prefix: `SyncEnterprise - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`, contextId: context.invocationId });
   logger.info("Role validated");
 
   let body: { orgnr?: string };
@@ -57,5 +59,6 @@ const syncEnterpriseHandler = async (request: HttpRequest, context: InvocationCo
 app.http("SyncEnterprise", {
   authLevel: "anonymous",
   methods: ["POST"],
-  handler: syncEnterpriseHandler
+  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> =>
+    await logContextHandling(request, context, syncEnterpriseHandler)
 });

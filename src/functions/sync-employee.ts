@@ -5,16 +5,18 @@ import { getSyncPrivatePersonMethod, syncPrivatePerson } from "../../lib/archive
 import { callFintfolk } from "../../lib/fintfolk.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
+import { updateContext } from "../middleware/async-local-context.js";
+import { logContextHandling } from "../middleware/logcontext-handling.js";
 
 const syncEmployeeHandler = async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
-  logger.logConfig({ prefix: "SyncEmployee", contextId: context.invocationId });
+  updateContext({ prefix: "SyncEmployee", contextId: context.invocationId });
 
   const { decoded, errorResponse } = validateAndGetToken(request.headers.get("authorization"));
   if (errorResponse) {
     return errorResponse;
   }
 
-  logger.logConfig({ prefix: `SyncEmployee - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`, contextId: context.invocationId });
+  updateContext({ prefix: `SyncEmployee - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`, contextId: context.invocationId });
   logger.info("Role validated");
 
   let body: { ssn?: string; ansattnummer?: string; upn?: string; forceUpdate?: boolean; manualManagerEmail?: string };
@@ -93,5 +95,6 @@ const syncEmployeeHandler = async (request: HttpRequest, context: InvocationCont
 app.http("SyncEmployee", {
   authLevel: "anonymous",
   methods: ["POST"],
-  handler: syncEmployeeHandler
+  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> =>
+    await logContextHandling(request, context, syncEmployeeHandler)
 });

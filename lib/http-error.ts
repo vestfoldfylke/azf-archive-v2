@@ -4,6 +4,7 @@ class HTTPError extends Error {
 
   constructor(code: number, message: string, data: unknown = null) {
     super(message);
+
     this.statusCode = code;
     this.message = message;
     this.data = data ?? null;
