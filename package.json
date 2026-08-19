@@ -28,12 +28,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vtfk/azf-archive.git"
+    "url": "git+https://github.com/vestfoldfylke/azf-archive-v2.git"
   },
   "bugs": {
-    "url": "https://github.com/vtfk/azf-archive/issues"
+    "url": "https://github.com/vestfoldfylke/azf-archive-v2/issues"
   },
-  "homepage": "https://github.com/vtfk/azf-archive#readme",
+  "homepage": "https://github.com/vestfoldfylke/azf-archive-v2#readme",
   "dependencies": {
     "@azure/functions": "^4.16.2",
     "@azure/msal-node": "^5.5.0",
