@@ -22,11 +22,11 @@ export type KRRPerson = {
   oppdatert?: string;
 };
 
-export type KRRResponse = {
+export type KRResponse = {
   personer: KRRPerson[];
 };
 
-export type KRRResult = {
+export type KRResult = {
   email: string | undefined;
   phoneNumber: string | undefined;
 };

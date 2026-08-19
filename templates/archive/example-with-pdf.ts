@@ -1,6 +1,8 @@
 import { GENERATED_PDF_PROPERTY_NAME } from "../../config.js"; // THIS LINE IS REQUIRED IF YOU NEED PDF GENERATION IN THE TEMPLATE
-export default {
-  pdfTemplate: (pdfData) => {
+import type { ArchivePayload, PdfPayload, Template, TemplateData } from "../../types/template.js";
+
+const template: Template = {
+  pdfTemplate: (pdfData: TemplateData): PdfPayload => {
     // A pdfTemplate adds GENERATED_PDF_PROPERTY_NAME-property to archiveData, which can be used in the archiveTemplate
     return {
       system: "smart",
@@ -22,7 +24,7 @@ export default {
       }
     };
   },
-  archiveTemplate: (archiveData) => {
+  archiveTemplate: (archiveData: TemplateData): ArchivePayload => {
     return {
       service: "DocumentService",
       method: "GetDocuments",
@@ -37,3 +39,5 @@ export default {
     beslutning: "en beslutning om no drit"
   }
 };
+
+export default template;

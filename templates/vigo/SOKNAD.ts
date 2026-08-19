@@ -1,7 +1,9 @@
 import { ARCHIVE_ROBOT } from "../../config.js";
 
-export default {
-  archiveTemplate: (archiveData) => {
+import type { ArchivePayload, Template, TemplateData } from "../../types/template.js";
+
+const template: Template = {
+  archiveTemplate: (archiveData: TemplateData): ArchivePayload => {
     const currentYear = new Date().getFullYear();
     const nextYear = currentYear + 1;
     return {
@@ -48,3 +50,5 @@ export default {
     base64: "heihei"
   }
 };
+
+export default template;

@@ -1,5 +1,7 @@
-export default {
-  archiveTemplate: () => {
+import type { ArchivePayload, Template } from "../../types/template.js";
+
+const template: Template = {
+  archiveTemplate: (): ArchivePayload => {
     return {
       service: "AccessGroupService",
       method: "GetAccessGroups",
@@ -11,3 +13,5 @@ export default {
   },
   requiredFields: {}
 };
+
+export default template;

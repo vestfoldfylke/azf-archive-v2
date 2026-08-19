@@ -1,5 +1,7 @@
-export default {
-  archiveTemplate: (archiveData) => {
+import type { ArchivePayload, Template, TemplateData } from "../../types/template.js";
+
+const template: Template = {
+  archiveTemplate: (archiveData: TemplateData): ArchivePayload => {
     return {
       service: "CaseService",
       method: "UpdateCase",
@@ -25,3 +27,5 @@ export default {
     recno: 12345
   }
 };
+
+export default template;

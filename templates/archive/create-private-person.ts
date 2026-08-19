@@ -1,5 +1,7 @@
-export default {
-  archiveTemplate: (archiveData) => {
+import type { ArchivePayload, Template, TemplateData } from "../../types/template.js";
+
+const template: Template = {
+  archiveTemplate: (archiveData: TemplateData): ArchivePayload => {
     return {
       service: "ContactService",
       method: "SynchronizePrivatePerson",
@@ -28,3 +30,5 @@ export default {
     zipPlace: "Fiktiviteten"
   }
 };
+
+export default template;

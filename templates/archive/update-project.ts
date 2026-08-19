@@ -1,5 +1,7 @@
-export default {
-  archiveTemplate: (archiveData) => {
+import type { ArchivePayload, Template, TemplateData } from "../../types/template.js";
+
+const template: Template = {
+  archiveTemplate: (archiveData: TemplateData): ArchivePayload => {
     return {
       service: "ProjectService",
       method: "UpdateProject",
@@ -16,3 +18,5 @@ export default {
     responsiblePersonEmail: "Nordmann@no.no"
   }
 };
+
+export default template;

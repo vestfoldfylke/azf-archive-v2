@@ -1,6 +1,6 @@
 import { logger } from "@vestfoldfylke/loglady";
 import { KRR } from "../config.js";
-import type { KRRResponse, KRRResult } from "../types/krr.js";
+import type { KRResponse, KRResult } from "../types/krr.js";
 import HTTPError from "./http-error.js";
 import { requestJson } from "./request-json.js";
 
@@ -14,7 +14,7 @@ const repackPhoneNumber = (phoneNumber: string): string => {
   return repacked;
 };
 
-const krr = async (ssn: string): Promise<KRRResult | null> => {
+const krr = async (ssn: string): Promise<KRResult | null> => {
   if (!ssn) throw new HTTPError(400, "Missing ssn for krr lookup");
   if (typeof ssn !== "string") throw new HTTPError(400, "ssn must be a string for krr lookup");
   if (ssn.length !== 11) throw new HTTPError(400, "ssn must be 11 digits for krr lookup");
@@ -24,7 +24,7 @@ const krr = async (ssn: string): Promise<KRRResult | null> => {
     method: "POST",
     body: [ssn],
     headers: { "X-FUNCTIONS-KEY": KRR.apiKey }
-  })) as KRRResponse;
+  })) as KRResponse;
 
   if (!data.personer || !Array.isArray(data.personer)) {
     throw new HTTPError(500, "No personer array found in KRR response");

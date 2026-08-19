@@ -1,5 +1,7 @@
-export default {
-  archiveTemplate: (archiveData) => {
+import type { ArchivePayload, Template, TemplateData } from "../../types/template.js";
+
+const template: Template = {
+  archiveTemplate: (archiveData: TemplateData): ArchivePayload => {
     return {
       service: "DocumentService",
       method: "CreateDocument",
@@ -45,3 +47,5 @@ export default {
     base64: "heihei"
   }
 };
+
+export default template;
