@@ -1,25 +1,25 @@
 module.exports = {
   archiveTemplate: (archiveData) => {
     return {
-      service: 'ProjectService',
-      method: 'CreateProject',
+      service: "ProjectService",
+      method: "CreateProject",
       parameter: {
         Title: `Personaldokumentasjon - ${archiveData.firstName} ${archiveData.lastName}`,
-        AccessGroup: 'Alle',
+        AccessGroup: "Alle",
         ResponsiblePersonEmail: archiveData.managerEmail,
         Contacts: [
           {
-            Role: 'Kontakt',
+            Role: "Kontakt",
             ReferenceNumber: archiveData.ssn
           }
         ]
       }
-    }
+    };
   },
   requiredFields: {
-    firstName: 'Ola',
-    lastName: 'Nordmann',
-    ssn: '01010101010',
-    managerEmail: 'sjef@sjefen.no'
+    firstName: "Ola",
+    lastName: "Nordmann",
+    ssn: "01010101010",
+    managerEmail: "sjef@sjefen.no"
   }
-}
+};

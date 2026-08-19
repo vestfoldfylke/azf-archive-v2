@@ -1,52 +1,52 @@
 module.exports = {
   archiveTemplate: (archiveData) => {
     return {
-      service: 'DocumentService',
-      method: 'CreateDocument',
+      service: "DocumentService",
+      method: "CreateDocument",
       parameter: {
-        AccessCode: '13',
+        AccessCode: "13",
         AccessGroup: archiveData.accessGroup,
-        Category: 'Internt notat med oppfølging',
+        Category: "Internt notat med oppfølging",
         Contacts: [
           {
             ReferenceNumber: archiveData.organizationNumber,
-            Role: 'Avsender'
+            Role: "Avsender"
           },
           {
             ReferenceNumber: archiveData.organizationNumber,
-            Role: 'Mottaker'
+            Role: "Mottaker"
           }
         ],
         DocumentDate: archiveData.documentDate,
         Files: [
           {
             Base64Data: archiveData.base64,
-            Category: '1',
-            Format: 'pdf',
-            Status: 'F',
+            Category: "1",
+            Format: "pdf",
+            Status: "F",
             Title: archiveData.title,
-            VersionFormat: 'A'
+            VersionFormat: "A"
           }
         ],
-        Paragraph: 'Offl. § 13 jf. fvl. § 13 (1) nr.1',
+        Paragraph: "Offl. § 13 jf. fvl. § 13 (1) nr.1",
         ResponsibleEnterpriseNumber: archiveData.organizationNumber,
         ResponsiblePersonRecno: archiveData.responsiblePersonRecno,
-        Status: 'J',
+        Status: "J",
         Title: archiveData.title,
         UnofficialTitle: archiveData.unofficialTitle,
-        Archive: 'Elevdokument',
+        Archive: "Elevdokument",
         CaseNumber: archiveData.caseNumber
       }
-    }
+    };
   },
   requiredFields: {
-    organizationNumber: '00000',
-    base64: 'fjkdsfhkdshkjfds',
-    accessGroup: 'Elev gul skole',
-    title: 'Tittlen',
-    unofficialTitle: 'uosfififkefxszsd tittkdlf',
-    documentDate: '2021-09-27',
-    caseNumber: '30/00000',
-    responsiblePersonRecno: '343566'
+    organizationNumber: "00000",
+    base64: "fjkdsfhkdshkjfds",
+    accessGroup: "Elev gul skole",
+    title: "Tittlen",
+    unofficialTitle: "uosfififkefxszsd tittkdlf",
+    documentDate: "2021-09-27",
+    caseNumber: "30/00000",
+    responsiblePersonRecno: "343566"
   }
-}
+};

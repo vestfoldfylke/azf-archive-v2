@@ -1,16 +1,16 @@
 module.exports = {
   archiveTemplate: (archiveData) => {
     return {
-      service: 'CaseService',
-      method: 'GetCases',
+      service: "CaseService",
+      method: "GetCases",
       parameter: {
-        Title: 'Elevmappe%',
+        Title: "Elevmappe%",
         ContactReferenceNumber: archiveData.ssn,
         IncludeCaseContacts: true
       }
-    }
+    };
   },
   requiredFields: {
-    ssn: '12345678910'
+    ssn: "12345678910"
   }
-}
+};

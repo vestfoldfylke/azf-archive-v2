@@ -1,95 +1,95 @@
-const { logConfig, logger } = require('@vtfk/logger')
-const callArchive = require('../lib/call-archive')
-const callArchiveTemplate = require('../lib/call-archive-template')
-const { ARCHIVE_ROLE } = require('../config')
-const { httpResponse } = require('../lib/http-response')
-const { decodeAccessToken } = require('../lib/decode-access-token')
+const { logConfig, logger } = require("@vtfk/logger");
+const callArchive = require("../lib/call-archive.js");
+const callArchiveTemplate = require("../lib/call-archive-template.js");
+const { ARCHIVE_ROLE } = require("../config.js");
+const { httpResponse } = require("../lib/http-response.js");
+const { decodeAccessToken } = require("../lib/decode-access-token.js");
 
 module.exports = async (context, req) => {
   logConfig({
-    prefix: 'Archive'
-  })
+    prefix: "Archive"
+  });
   // Verify token
-  const decoded = decodeAccessToken(req.headers.authorization)
+  const decoded = decodeAccessToken(req.headers.authorization);
 
   if (!decoded.verified) {
-    logger('warn', ['Token is not valid', decoded.msg], context)
-    return httpResponse(401, decoded.msg)
+    logger("warn", ["Token is not valid", decoded.msg], context);
+    return httpResponse(401, decoded.msg);
   }
 
-  logger('info', ['Validating role'], context)
+  logger("info", ["Validating role"], context);
   if (!decoded.roles.includes(ARCHIVE_ROLE)) {
-    logger('info', ['Missing required role for access'], context)
-    return httpResponse(403, 'Missing required role for access')
+    logger("info", ["Missing required role for access"], context);
+    return httpResponse(403, "Missing required role for access");
   }
 
   logConfig({
-    prefix: `Archive - clientId ${decoded.appid}${decoded.upn ? ' - ' + decoded.upn : ''}`
-  })
+    prefix: `Archive - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`
+  });
 
-  logger('info', ['Role validated'], context)
+  logger("info", ["Role validated"], context);
 
   // Input validation
   if (!req.body) {
-    const msg = 'Please pass a request body'
-    logger('error', msg, context)
-    return httpResponse(400, msg)
+    const msg = "Please pass a request body";
+    logger("error", msg, context);
+    return httpResponse(400, msg);
   }
 
-  const { service, method, system, template, parameter, demoRun, getExample, options } = req.body
+  const { service, method, system, template, parameter, demoRun, getExample, options } = req.body;
   if (!parameter) {
-    const msg = 'Missing required parameter "parameter"'
-    logger('error', msg, context)
-    return httpResponse(400, msg)
+    const msg = 'Missing required parameter "parameter"';
+    logger("error", msg, context);
+    return httpResponse(400, msg);
   }
   // Either (service and method) or (system and template) is required
   if (!(service && method) && !(system, template)) {
-    const msg = 'Missing required parameter combination ("service" and "method") or ("system" and "template")'
-    logger('error', msg, context)
-    return httpResponse(400, msg)
+    const msg = 'Missing required parameter combination ("service" and "method") or ("system" and "template")';
+    logger("error", msg, context);
+    return httpResponse(400, msg);
   }
 
   // Validate that parameter is valid json
   try {
-    JSON.parse(JSON.stringify(parameter))
-  } catch (error) {
-    const msg = 'Parameter "parameter" must be valid json!'
-    logger('error', msg, context)
-    return httpResponse(400, msg)
+    JSON.parse(JSON.stringify(parameter));
+  } catch (_error) {
+    const msg = 'Parameter "parameter" must be valid json!';
+    logger("error", msg, context);
+    return httpResponse(400, msg);
   }
   // Validate that options is valid json if exists
   try {
-    if (options) JSON.parse(JSON.stringify(options))
-  } catch (error) {
-    const msg = 'Parameter "options" must be valid json!'
-    logger('error', msg, context)
-    return httpResponse(400, msg)
+    if (options) JSON.parse(JSON.stringify(options));
+  } catch (_error) {
+    const msg = 'Parameter "options" must be valid json!';
+    logger("error", msg, context);
+    return httpResponse(400, msg);
   }
 
   // Finished validation - we have valid role, either service, method, or system and template
   logConfig({
-    prefix: `Archive - clientId ${decoded.appid}${decoded.upn ? ' - ' + decoded.upn : ''} - ${service || system} - ${method || template}`
-  })
+    prefix: `Archive - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""} - ${service || system} - ${method || template}`
+  });
 
   // Raw call
   if (service && method) {
     try {
-      const archiveResult = await callArchive({ service, method, parameter, options }, context)
-      return httpResponse(200, archiveResult)
+      const archiveResult = await callArchive({ service, method, parameter, options }, context);
+      return httpResponse(200, archiveResult);
     } catch (error) {
-      logger('error', ['Raw archive call failed', error.response?.data || error.stack || error.toString()], context)
-      return httpResponse(500, error) // 500 is fallback status code
+      logger("error", ["Raw archive call failed", error.response?.data || error.stack || error.toString()], context);
+      return httpResponse(500, error); // 500 is fallback status code
     }
   }
 
   //  Template call
   if (system && template) {
     try {
-      const templateResult = await callArchiveTemplate({ system, template, parameter, getExample, demoRun }, context)
-      return httpResponse(200, templateResult)
+      const templateResult = await callArchiveTemplate({ system, template, parameter, getExample, demoRun }, context);
+      return httpResponse(200, templateResult);
     } catch (error) {
-      logger('error', ['Template archive call failed', error.response?.data || error.stack || error.toString()], context)
-      return httpResponse(500, error)
+      logger("error", ["Template archive call failed", error.response?.data || error.stack || error.toString()], context);
+      return httpResponse(500, error);
     }
   }
-}
+};

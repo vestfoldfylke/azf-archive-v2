@@ -1,15 +1,15 @@
 module.exports = {
   archiveTemplate: (archiveData) => {
     return {
-      service: 'ContactService',
-      method: 'GetPrivatePersons',
+      service: "ContactService",
+      method: "GetPrivatePersons",
       parameter: {
         PersonalIdNumber: archiveData.ssn,
-        Active: 'true'
+        Active: "true"
       }
-    }
+    };
   },
   requiredFields: {
-    ssn: '01010101010'
+    ssn: "01010101010"
   }
-}
+};

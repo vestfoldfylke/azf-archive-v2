@@ -1,17 +1,17 @@
 module.exports = {
   archiveTemplate: (archiveData) => {
     return {
-      service: 'ProjectService',
-      method: 'GetProjects',
+      service: "ProjectService",
+      method: "GetProjects",
       parameter: {
-        Title: 'Personaldokumentasjon%',
+        Title: "Personaldokumentasjon%",
         ContactReferenceNumber: archiveData.ssn,
         IncludeProjectContacts: true,
-        StatusCode: 'Under utføring'
+        StatusCode: "Under utføring"
       }
-    }
+    };
   },
   requiredFields: {
-    ssn: '01010101010'
+    ssn: "01010101010"
   }
-}
+};

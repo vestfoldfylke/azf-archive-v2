@@ -1,92 +1,100 @@
-const { logConfig, logger } = require('@vtfk/logger')
-const { ARCHIVE_ROLE } = require('../config')
-const { httpResponse } = require('../lib/http-response')
-const { decodeAccessToken } = require('../lib/decode-access-token')
-const syncSharePointSite = require('../lib/archive/sync-sharepoint-site')
-const HTTPError = require('../lib/http-error')
+const { logConfig, logger } = require("@vtfk/logger");
+const { ARCHIVE_ROLE } = require("../config.js");
+const { httpResponse } = require("../lib/http-response.js");
+const { decodeAccessToken } = require("../lib/decode-access-token.js");
+const syncSharePointSite = require("../lib/archive/sync-sharepoint-site.js");
+const HTTPError = require("../lib/http-error.js");
 
 const validateInput = (body) => {
-  const { siteUrl, projectTitle, responsiblePersonEmail, caseExternalId, caseTitle } = body
+  const { siteUrl, projectTitle, responsiblePersonEmail, caseExternalId, caseTitle } = body;
   if (!siteUrl) {
-    throw new HTTPError(400, 'Missing required parameter "siteUrl"')
+    throw new HTTPError(400, 'Missing required parameter "siteUrl"');
   }
-  if (typeof siteUrl !== 'string') {
-    throw new HTTPError(400, '"siteUrl" must be string')
+  if (typeof siteUrl !== "string") {
+    throw new HTTPError(400, '"siteUrl" must be string');
   }
   if (!caseTitle) {
-    throw new HTTPError(400, 'Missing required parameter "caseTitle"')
+    throw new HTTPError(400, 'Missing required parameter "caseTitle"');
   }
-  if (typeof caseTitle !== 'string') {
-    throw new HTTPError(400, '"caseTitle" must be string')
+  if (typeof caseTitle !== "string") {
+    throw new HTTPError(400, '"caseTitle" must be string');
   }
   if (!projectTitle) {
-    throw new HTTPError(400, 'Missing required parameter "projectTitle"')
+    throw new HTTPError(400, 'Missing required parameter "projectTitle"');
   }
-  if (typeof projectTitle !== 'string') {
-    throw new HTTPError(400, '"projectTitle" must be string')
+  if (typeof projectTitle !== "string") {
+    throw new HTTPError(400, '"projectTitle" must be string');
   }
   if (!responsiblePersonEmail) {
-    throw new HTTPError(400, 'Missing required parameter "responsiblePersonEmail"')
+    throw new HTTPError(400, 'Missing required parameter "responsiblePersonEmail"');
   }
-  if (typeof responsiblePersonEmail !== 'string') {
-    throw new HTTPError(400, '"responsiblePersonEmail" must be string')
+  if (typeof responsiblePersonEmail !== "string") {
+    throw new HTTPError(400, '"responsiblePersonEmail" must be string');
   }
   if (!caseExternalId) {
-    throw new HTTPError(400, 'Missing required parameter "caseExternalId"')
+    throw new HTTPError(400, 'Missing required parameter "caseExternalId"');
   }
-  if (typeof caseExternalId !== 'string') {
-    throw new HTTPError(400, '"caseExternalId" must be string')
+  if (typeof caseExternalId !== "string") {
+    throw new HTTPError(400, '"caseExternalId" must be string');
   }
-}
+};
 
 module.exports = async (context, req) => {
   logConfig({
-    prefix: 'SyncSharepointSite'
-  })
+    prefix: "SyncSharepointSite"
+  });
   // Verify token
-  const decoded = decodeAccessToken(req.headers.authorization)
+  const decoded = decodeAccessToken(req.headers.authorization);
 
   if (!decoded.verified) {
-    logger('warn', ['Token is not valid', decoded.msg], context)
-    return httpResponse(401, decoded.msg)
+    logger("warn", ["Token is not valid", decoded.msg], context);
+    return httpResponse(401, decoded.msg);
   }
 
-  logger('info', ['Validating role'], context)
+  logger("info", ["Validating role"], context);
   if (!decoded.roles.includes(ARCHIVE_ROLE)) {
-    logger('info', ['Missing required role for access'], context)
-    return httpResponse(403, 'Missing required role for access')
+    logger("info", ["Missing required role for access"], context);
+    return httpResponse(403, "Missing required role for access");
   }
 
   logConfig({
-    prefix: `SyncSharepointSite - clientId ${decoded.appid}${decoded.upn ? ' - ' + decoded.upn : ''}`
-  })
+    prefix: `SyncSharepointSite - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`
+  });
 
-  logger('info', ['Role validated'], context)
+  logger("info", ["Role validated"], context);
 
   // Input validation
   if (!req.body) {
-    const msg = 'Please pass a request body'
-    logger('error', msg, context)
-    return httpResponse(400, msg)
+    const msg = "Please pass a request body";
+    logger("error", msg, context);
+    return httpResponse(400, msg);
   }
 
   // Below, we see valid input properties in body
-  const { siteUrl, projectTitle, responsiblePersonEmail, projectNumber, caseExternalId, caseTitle, accessGroup, paragraph, caseType } = req.body
+  const { siteUrl, projectTitle, responsiblePersonEmail, projectNumber, caseExternalId, caseTitle, accessGroup, paragraph, caseType } = req.body;
   try {
-    validateInput(req.body)
+    validateInput(req.body);
   } catch (error) {
-    return httpResponse(500, error)
+    return httpResponse(500, error);
   }
   const input = {
-    siteUrl, projectTitle, responsiblePersonEmail, projectNumber, caseExternalId, caseTitle, accessGroup, paragraph, caseType
-  }
+    siteUrl,
+    projectTitle,
+    responsiblePersonEmail,
+    projectNumber,
+    caseExternalId,
+    caseTitle,
+    accessGroup,
+    paragraph,
+    caseType
+  };
   try {
-    logger('info', `Trying to sync SharePointSite: SiteUrl: ${siteUrl}`)
-    const result = await syncSharePointSite(input, context)
-    logger('info', `Succesfully synced SharePointSite. SiteUrl: ${siteUrl}`)
-    return httpResponse(200, result)
+    logger("info", `Trying to sync SharePointSite: SiteUrl: ${siteUrl}`);
+    const result = await syncSharePointSite(input, context);
+    logger("info", `Succesfully synced SharePointSite. SiteUrl: ${siteUrl}`);
+    return httpResponse(200, result);
   } catch (error) {
-    logger('error', ['error when syncing SharePointSite', error.response?.data || error.stack || error.toString()], context)
-    return httpResponse(500, error)
+    logger("error", ["error when syncing SharePointSite", error.response?.data || error.stack || error.toString()], context);
+    return httpResponse(500, error);
   }
-}
+};

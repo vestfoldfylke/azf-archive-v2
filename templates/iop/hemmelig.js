@@ -1,16 +1,16 @@
-const { GENERATED_PDF_PROPERTY_NAME } = require('../../config') // THIS LINE IS REQUIRED IF YOU NEED PDF GENERATION IN THE TEMPLATE
+const { GENERATED_PDF_PROPERTY_NAME } = require("../../config.js"); // THIS LINE IS REQUIRED IF YOU NEED PDF GENERATION IN THE TEMPLATE
 module.exports = {
   pdfTemplate: (pdfData) => {
     // A pdfTemplate adds GENERATED_PDF_PROPERTY_NAME-property to archiveData, which can be used in the archiveTemplate
     return {
-      system: 'iop',
-      template: 'hemmelig',
-      language: 'nb',
-      type: '2',
-      version: 'B',
+      system: "iop",
+      template: "hemmelig",
+      language: "nb",
+      type: "2",
+      version: "B",
       data: {
         created: {
-          timestamp: new Date().getTime()
+          timestamp: Date.now()
         },
         student: {
           name: pdfData.student.name,
@@ -23,62 +23,62 @@ module.exports = {
           name: pdfData.school.name
         }
       }
-    }
+    };
   },
   archiveTemplate: (archiveData) => {
     return {
-      service: 'DocumentService',
-      method: 'CreateDocument',
+      service: "DocumentService",
+      method: "CreateDocument",
       parameter: {
-        AccessCode: '13',
+        AccessCode: "13",
         AccessGroup: archiveData.accessGroup,
-        Category: 'Internt notat med oppfølging',
+        Category: "Internt notat med oppfølging",
         Contacts: [
           {
             ReferenceNumber: archiveData.organizationNumber,
-            Role: 'Avsender'
+            Role: "Avsender"
           },
           {
             ReferenceNumber: archiveData.organizationNumber,
-            Role: 'Mottaker'
+            Role: "Mottaker"
           }
         ],
         DocumentDate: archiveData.documentDate,
         Files: [
           {
             Base64Data: archiveData[GENERATED_PDF_PROPERTY_NAME], // pdf created by the pdfTemplate (special case and not a required field - because the pdfTemplate handles it)
-            Category: '1',
-            Format: 'pdf',
-            Status: 'F',
+            Category: "1",
+            Format: "pdf",
+            Status: "F",
             Title: `Individuell opplæringsplan ${archiveData.documentNumber}, må skrives ut og leveres til elev`,
-            VersionFormat: 'A'
+            VersionFormat: "A"
           }
         ],
-        Paragraph: 'Offl. § 13 jf. fvl. § 13 (1) nr.1',
+        Paragraph: "Offl. § 13 jf. fvl. § 13 (1) nr.1",
         ResponsibleEnterpriseNumber: archiveData.organizationNumber,
-        Status: 'J',
+        Status: "J",
         Title: `Individuell opplæringsplan ${archiveData.documentNumber}, må skrives ut og leveres til elev`,
         UnofficialTitle: `Individuell opplæringsplan ${archiveData.documentNumber}, må skrives ut og leveres til elev - ${archiveData.student.name}`,
-        Archive: 'Elevdokument',
+        Archive: "Elevdokument",
         CaseNumber: archiveData.caseNumber
       }
-    }
+    };
   },
   requiredFields: {
-    accessGroup: 'Elev belev vgs',
-    organizationNumber: '00000',
-    documentDate: '2021-09-27',
-    documentNumber: '30/00000-12',
+    accessGroup: "Elev belev vgs",
+    organizationNumber: "00000",
+    documentDate: "2021-09-27",
+    documentNumber: "30/00000-12",
     student: {
-      name: 'Ola Nordmann',
-      classId: 'GUL:5OPP'
+      name: "Ola Nordmann",
+      classId: "GUL:5OPP"
     },
     teacher: {
-      name: 'Kari Nordmann'
+      name: "Kari Nordmann"
     },
     school: {
-      name: 'Gul vgs'
+      name: "Gul vgs"
     },
-    caseNumber: '30/00000'
+    caseNumber: "30/00000"
   }
-}
+};
