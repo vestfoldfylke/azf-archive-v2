@@ -1,10 +1,9 @@
 import { app, type HttpRequest, type HttpResponseInit, type InvocationContext } from "@azure/functions";
 import { logger } from "@vestfoldfylke/loglady";
-import { ARCHIVE_ROLE } from "../../config.js";
 import callArchive from "../../lib/call-archive.js";
 import callArchiveTemplate from "../../lib/call-archive-template.js";
-import { decodeAccessToken } from "../../lib/decode-access-token.js";
 import { httpResponse } from "../../lib/http-response.js";
+import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
 
 type ArchiveBody = {
   service?: string;
@@ -20,17 +19,9 @@ type ArchiveBody = {
 const archiveHandler = async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
   logger.logConfig({ prefix: "Archive", contextId: context.invocationId });
 
-  const decoded = decodeAccessToken(request.headers.get("authorization")) as { verified: boolean; msg: string | null; roles: string[]; appid?: string; upn?: string };
-
-  if (!decoded.verified) {
-    logger.warn(`Token is not valid - ${decoded.msg}`);
-    return httpResponse(401, decoded.msg ?? "Token is not valid");
-  }
-
-  logger.info("Validating role");
-  if (!decoded.roles.includes(ARCHIVE_ROLE)) {
-    logger.info("Missing required role for access");
-    return httpResponse(403, "Missing required role for access");
+  const { decoded, errorResponse } = validateAndGetToken(request.headers.get("authorization"));
+  if (errorResponse) {
+    return errorResponse;
   }
 
   logger.logConfig({ prefix: `Archive - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`, contextId: context.invocationId });

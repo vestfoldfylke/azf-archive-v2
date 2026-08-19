@@ -1,24 +1,10 @@
-import { decode } from "jsonwebtoken";
+import { decode, type JwtPayload } from "jsonwebtoken";
+import type { DecodedAccessToken } from "../types/auth.js";
 
-/**
- * @typedef {Object} Decoded
- * @property {string} upn - UserPrincipalName
- * @property {string} appid - Application id
- * @property {boolean} verified - If the token passes the checks
- * @property {string} msg - Descriptive message if the verification fails
- * @property {Array} roles - Roles for the token
- */
-
-/**
- *
- * @param {string} token
- * @return {Decoded}
- */
-const decodeAccessToken = (token) => {
-  const result = {
+export const decodeAccessToken = (token: string | null): DecodedAccessToken => {
+  const result: DecodedAccessToken = {
     upn: "",
     appid: "",
-    oid: "",
     verified: false,
     msg: "",
     roles: []
@@ -29,7 +15,7 @@ const decodeAccessToken = (token) => {
     return result;
   }
 
-  let decoded;
+  let decoded: JwtPayload | string | null;
   try {
     decoded = decode(token.replace("Bearer ", ""));
   } catch (_error) {
@@ -42,19 +28,21 @@ const decodeAccessToken = (token) => {
     return result;
   }
 
-  const { upn, appid, roles, oid } = decoded;
-  if (!upn && !appid) {
+  if (typeof decoded === "string") {
+    result.msg = "Token is just a plain string. Probably invalid 🤷‍♂️";
+    return result;
+  }
+
+  const { upn, appid, roles } = decoded;
+  if (!upn || !appid) {
     result.msg = "Token is missing upn or appId";
     return result;
   }
 
   result.appid = appid;
   result.upn = upn || "appReg";
-  result.oid = oid;
   result.verified = true;
   result.roles = roles || [];
 
   return result;
 };
-
-export { decodeAccessToken };

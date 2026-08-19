@@ -1,10 +1,9 @@
 import { app, type HttpRequest, type HttpResponseInit, type InvocationContext } from "@azure/functions";
 import { logger } from "@vestfoldfylke/loglady";
-import { ARCHIVE_ROLE } from "../../config.js";
 import syncSharePointSite from "../../lib/archive/sync-sharepoint-site.js";
-import { decodeAccessToken } from "../../lib/decode-access-token.js";
 import HTTPError from "../../lib/http-error.js";
 import { httpResponse } from "../../lib/http-response.js";
+import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
 
 type SharePointBody = {
   siteUrl?: unknown;
@@ -35,17 +34,9 @@ const validateInput = (body: SharePointBody): void => {
 const syncSharepointSiteHandler = async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
   logger.logConfig({ prefix: "SyncSharepointSite", contextId: context.invocationId });
 
-  const decoded = decodeAccessToken(request.headers.get("authorization")) as { verified: boolean; msg: string | null; roles: string[]; appid?: string; upn?: string };
-
-  if (!decoded.verified) {
-    logger.warn(`Token is not valid - ${decoded.msg}`);
-    return httpResponse(401, decoded.msg ?? "Token is not valid");
-  }
-
-  logger.info("Validating role");
-  if (!decoded.roles.includes(ARCHIVE_ROLE)) {
-    logger.info("Missing required role for access");
-    return httpResponse(403, "Missing required role for access");
+  const { decoded, errorResponse } = validateAndGetToken(request.headers.get("authorization"));
+  if (errorResponse) {
+    return errorResponse;
   }
 
   logger.logConfig({ prefix: `SyncSharepointSite - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`, contextId: context.invocationId });
