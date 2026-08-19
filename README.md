@@ -562,7 +562,6 @@ All templates are found in [the templates folder](./templates/)
     "Values": {
       "AzureWebJobsStorage": "",
       "FUNCTIONS_WORKER_RUNTIME": "node",
-      "ALLOW_LEGACY_RENEGOTIATION": false,
       "ARCHIVE_ROLE": "Archive",
       "ARCHIVE_URL": "sif rpc url",
       "ARCHIVE_CLIENT_ID": "sif client id",

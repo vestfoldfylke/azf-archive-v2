@@ -34,7 +34,6 @@
   "dependencies": {
     "@azure/msal-node": "^5.5.0",
     "@vtfk/logger": "^6.4.2",
-    "axios": "^1.13.6",
     "jsonwebtoken": "^9.0.3",
     "node-cache": "^5.1.2",
     "vtfk-schools-info": "^3.4.2"

@@ -11,7 +11,6 @@ module.exports = {
     accessGroup: process.env.ARCHIVE_ROBOT_ACCESS_GROUP || "VFK Robot",
     departmentRecno: process.env.ARCHIVE_ROBOT_DEPARTMENT || "200006"
   },
-  ALLOW_LEGACY_RENEGOTIATION: (process.env.ALLOW_LEGACY_RENEGOTIATION && process.env.ALLOW_LEGACY_RENEGOTIATION === "true") || false, // If you cant use tls1.2
   BRREG: {
     url: process.env.BRREG_URL || "https://data.brreg.no/enhetsregisteret/api/enheter/",
     branchUrl: process.env.BRREG_BRANCH_URL || "https://data.brreg.no/enhetsregisteret/api/underenheter/"
