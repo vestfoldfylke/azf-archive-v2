@@ -3,6 +3,7 @@ import { logger } from "@vestfoldfylke/loglady";
 import { syncEmployee } from "../../lib/archive/sync-employee.js";
 import { getSyncPrivatePersonMethod, syncPrivatePerson } from "../../lib/archive/sync-private-person.js";
 import { callFintfolk } from "../../lib/fintfolk.js";
+import HTTPError from "../../lib/http-error.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
 import { updateContext } from "../middleware/async-local-context.js";
@@ -56,11 +57,15 @@ const syncEmployeeHandler = async (request: HttpRequest, context: InvocationCont
   try {
     logger.info("Calling fintfolk");
     fintfolkEmployee = (await callFintfolk(resourceUrl)) as typeof fintfolkEmployee;
-    logger.info("Succesfully got response from fintfolk");
+    logger.info("Successfully got response from fintfolk");
   } catch (error) {
-    const err = error as { stack?: string; toString: () => string };
-    logger.error(`error when calling fintfolk - ${err.stack || err.toString()}`);
-    return httpResponse(500, err as Error);
+    if (error instanceof HTTPError) {
+      logger.errorException(error, "Error when calling FINTFolk - Status: {Status} - Data: {@Data}", error.statusCode, error.data as object);
+      return httpResponse(error.statusCode, error);
+    }
+
+    logger.errorException(error, "Error when calling FINTFolk");
+    return httpResponse(500, error);
   }
 
   const syncPrivatePersonData = {
@@ -73,28 +78,35 @@ const syncEmployeeHandler = async (request: HttpRequest, context: InvocationCont
     logger.info("Syncing PrivatePerson");
     getSyncPrivatePersonMethod(syncPrivatePersonData);
     privatePerson = await syncPrivatePerson(syncPrivatePersonData, context);
-    logger.info("Succesfully synced PrivatePerson");
+    logger.info("Successfully synced PrivatePerson");
   } catch (error) {
-    const err = error as { stack?: string; toString: () => string };
-    logger.error(`error when syncing privatePerson - ${err.stack || err.toString()}`);
-    return httpResponse(500, err as Error);
+    if (error instanceof HTTPError) {
+      logger.errorException(error, "Error when syncing privatePerson - Status: {Status} - Data: {@Data}", error.statusCode, error.data as object);
+      return httpResponse(error.statusCode, error);
+    }
+
+    logger.errorException(error, "Error when syncing privatePerson");
+    return httpResponse(500, error);
   }
 
   try {
     logger.info("Syncing employee");
     const { responsibleEnterprise, archiveManager } = await syncEmployee(privatePerson, fintfolkEmployee, manualManagerEmail, context);
-    logger.info("Succesfully synced employee");
+    logger.info("Successfully synced employee");
     return httpResponse(200, { privatePerson, archiveManager, responsibleEnterprise });
   } catch (error) {
-    const err = error as { stack?: string; toString: () => string };
-    logger.error(`error when syncing employee - ${err.stack || err.toString()}`);
-    return httpResponse(500, err as Error);
+    if (error instanceof HTTPError) {
+      logger.errorException(error, "Error when syncing employee - Status: {Status} - Data: {@Data}", error.statusCode, error.data as object);
+      return httpResponse(error.statusCode, error);
+    }
+
+    logger.errorException(error, "Error when syncing employee");
+    return httpResponse(500, error);
   }
 };
 
 app.http("SyncEmployee", {
   authLevel: "anonymous",
   methods: ["POST"],
-  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> =>
-    await logContextHandling(request, context, syncEmployeeHandler)
+  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => await logContextHandling(request, context, syncEmployeeHandler)
 });

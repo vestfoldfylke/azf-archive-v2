@@ -2,6 +2,7 @@ import { app, type HttpRequest, type HttpResponseInit, type InvocationContext } 
 import { logger } from "@vestfoldfylke/loglady";
 import { syncElevmappe } from "../../lib/archive/sync-elevmappe.js";
 import { getName, getSyncPrivatePersonMethod, syncPrivatePerson } from "../../lib/archive/sync-private-person.js";
+import HTTPError from "../../lib/http-error.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
 import { updateContext } from "../middleware/async-local-context.js";
@@ -59,28 +60,35 @@ const syncElevmappeHandler = async (request: HttpRequest, context: InvocationCon
     logger.info("Syncing PrivatePerson");
     getSyncPrivatePersonMethod(syncPrivatePersonData);
     privatePerson = await syncPrivatePerson(syncPrivatePersonData, context);
-    logger.info("Succesfully synced PrivatePerson");
+    logger.info("Successfully synced PrivatePerson");
   } catch (error) {
-    const err = error as { stack?: string; toString: () => string };
-    logger.error(`error when syncing privatePerson - ${err.stack || err.toString()}`);
-    return httpResponse(500, err as Error);
+    if (error instanceof HTTPError) {
+      logger.errorException(error, "Error when syncing privatePerson - Status: {Status} - Data: {@Data}", error.statusCode, error.data as object);
+      return httpResponse(error.statusCode, error);
+    }
+
+    logger.errorException(error, "Error when syncing privatePerson");
+    return httpResponse(500, error);
   }
 
   try {
     logger.info("Syncing elevmappe");
     const elevmappe = await syncElevmappe(privatePerson, context);
-    logger.info("Succesfully synced elevmappe");
+    logger.info("Successfully synced elevmappe");
     return httpResponse(200, { privatePerson, elevmappe });
   } catch (error) {
-    const err = error as { stack?: string; toString: () => string };
-    logger.error(`error when syncing elevmappe - ${err.stack || err.toString()}`);
-    return httpResponse(500, err as Error);
+    if (error instanceof HTTPError) {
+      logger.errorException(error, "Error when syncing elevmappe - Status: {Status} - Data: {@Data}", error.statusCode, error.data as object);
+      return httpResponse(error.statusCode, error);
+    }
+
+    logger.errorException(error, "Error when syncing elevmappe");
+    return httpResponse(500, error);
   }
 };
 
 app.http("SyncElevmappe", {
   authLevel: "anonymous",
   methods: ["POST"],
-  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> =>
-    await logContextHandling(request, context, syncElevmappeHandler)
+  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => await logContextHandling(request, context, syncElevmappeHandler)
 });

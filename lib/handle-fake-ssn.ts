@@ -41,21 +41,21 @@ const handleFakeSsn = async (birthdate: string, gender: string, name: string, co
   const lastName = getLastName(name);
   while (!foundUnique) {
     const fakeSsn = newFakeSsn(birthdate, gender, runningNumber);
-    logger.info(`Check for existing PrivatePersons on fake ssn ${fakeSsn}`);
+    logger.info("Check for existing PrivatePersons on fake ssn {FakeSsn}", fakeSsn);
     const privatePersonRes = (await callArchiveTemplate({ system: "archive", template: "get-private-person", parameter: { ssn: fakeSsn } }, context)) as Array<{ LastName?: string }>;
     privatePersonResult = privatePersonRes;
     if (privatePersonRes.length === 1 && privatePersonRes[0].LastName === lastName) {
-      logger.info(`Found existing PrivatePersons on fake ssn ${fakeSsn} with same lastName as provided in body, will use it`);
+      logger.info("Found existing PrivatePersons on fake ssn {FakeSsn} with same lastName as provided in body, will use it", fakeSsn);
       foundUnique = true;
       resultFakeSsn = fakeSsn;
     } else if (privatePersonRes.length === 0) {
-      logger.info(`No PrivatePerson found on fake ssn ${fakeSsn}, will use it to create new PrivatePerson`);
+      logger.info("No PrivatePerson found on fake ssn {FakeSsn}, will use it to create new PrivatePerson", fakeSsn);
       foundUnique = true;
       resultFakeSsn = fakeSsn;
     } else if (privatePersonRes.length > 1) {
       throw new HTTPError(500, `Found several privatepersons on fake ssn ${fakeSsn}, send to arkivarer for handling (av tre pils til Jorgen)`);
     } else {
-      logger.info(`PrivatePerson found on fake ssn ${fakeSsn}, but not matching lastNames, will generate new fakeSsn and continue checking.`);
+      logger.info("PrivatePerson found on fake ssn {FakeSsn}, but not matching lastNames, will generate new fakeSsn and continue checking.", fakeSsn);
       runningNumber -= 1;
       if (runningNumber < 1) throw new Error(`AIAIA, no all 99 running numbers have been used up for fake ssn on birthdate ${birthdate} and gender ${gender} - what to do, what to do...`);
       // Consider to add sleep function, if it fails a lot

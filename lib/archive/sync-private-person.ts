@@ -252,9 +252,9 @@ const syncPrivatePerson = async (syncPrivatePersonData, context) => {
       privatePerson.updated = false;
       privatePerson.created = true;
     }
-    logger.info(`Successfully created PrivatePerson wth recno ${privatePerson.recno}`);
+    logger.info("Successfully created PrivatePerson wth Recno {Recno}", privatePerson.recno);
   } else {
-    logger.info(`Found ${privatePersonRes.length} match(es) on identifier data`);
+    logger.info("Found {PrivatePersonLength} match(es) on identifier data", privatePersonRes.length);
     if (privatePersonRes.length > 1) {
       // One or more matches - check if there are too many
       // Send e-post til arkivet om at det er flere aktive privatpersoner på samme fnr
@@ -267,12 +267,12 @@ const syncPrivatePerson = async (syncPrivatePersonData, context) => {
         },
         context
       );
-      logger.warn(`syncPrivatePerson - Found several privatePerson on the same social security number: ${ssnToUse}, sent mail to arkivarer for handling`);
+      logger.warn("syncPrivatePerson - Found several privatePerson on the same social security number: {Ssn}, sent mail to arkivarer for handling", ssnToUse);
     }
     const foundPrivatePerson = privatePersonRes[0]; // take the first one
     if (forceUpdate) {
       // Her skal det oppdateres samma hva!
-      logger.info(`ForceUpdate is true, updating data on privatePerson with recno: ${foundPrivatePerson.Recno}`);
+      logger.info("ForceUpdate is true, updating data on privatePerson with Recno: {Recno}", foundPrivatePerson.Recno);
       if (manualData || fakeSsn) {
         // UPDATE privateperson with manual data
         const { firstName, lastName } = getFirstAndLastName(name);
@@ -289,7 +289,7 @@ const syncPrivatePerson = async (syncPrivatePersonData, context) => {
         let updatePrivatePersonRes = null;
         let updated = false;
         if (privatePersonIsUpToDate(foundPrivatePerson, privatePersonData)) {
-          logger.info(`PrivatePerson with recno: ${foundPrivatePerson.Recno} is already up to date, no need to update`);
+          logger.info("PrivatePerson with Recno: {Recno} is already up to date, no need to update", foundPrivatePerson.Recno);
           updatePrivatePersonRes = foundPrivatePerson.Recno;
         } else {
           updatePrivatePersonRes = await callArchiveTemplate({ system: "archive", template: "update-private-person", parameter: privatePersonData }, context); // Returns recno of updated privatePerson
@@ -330,7 +330,7 @@ const syncPrivatePerson = async (syncPrivatePersonData, context) => {
         let updatePrivatePersonRes = null;
         let updated = false;
         if (privatePersonIsUpToDate(foundPrivatePerson, privatePersonData)) {
-          logger.info(`PrivatePerson with recno: ${foundPrivatePerson.Recno} is already up to date, no need to update`);
+          logger.info("PrivatePerson with Recno: {Recno} is already up to date, no need to update", foundPrivatePerson.Recno);
           updatePrivatePersonRes = foundPrivatePerson.Recno;
         } else {
           updatePrivatePersonRes = await callArchiveTemplate({ system: "archive", template: "update-private-person", parameter: privatePersonData }, context); // Returns recno of updated privatePerson
@@ -349,7 +349,7 @@ const syncPrivatePerson = async (syncPrivatePersonData, context) => {
         privatePerson.updated = updated;
         privatePerson.created = false;
       }
-      logger.info(`Successfully updated data on privatePerson with recno: ${foundPrivatePerson.Recno}`);
+      logger.info("Successfully updated data on privatePerson with Recno: {Recno}", foundPrivatePerson.Recno);
     } else {
       // Vi trenger ikke oppdatere, kan bare returnere luringen
       const addressProtection = Boolean(foundPrivatePerson.PrivateAddress.StreetAddress?.toLowerCase().includes("sperret"));
@@ -380,7 +380,7 @@ const syncPrivatePerson = async (syncPrivatePersonData, context) => {
       },
       context
     );
-    logger.warn(`syncPrivatePerson - Handled privatePerson with addressProtection, recno:  - ${privatePerson.recno}`);
+    logger.warn("syncPrivatePerson - Handled privatePerson with addressProtection, Recno: {Recno}", privatePerson.recno);
   }
 
   // Do a simple check that no values are null, to make sure the api works

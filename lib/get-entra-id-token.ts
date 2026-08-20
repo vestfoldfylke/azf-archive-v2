@@ -32,7 +32,7 @@ async function getToken(scope: string, options: { forceNew: boolean } = { forceN
     throw new Error("getEntraIdToken - Failed to acquire access value from Microsoft");
   }
   const expires = Math.floor((result.expiresOn.getTime() - Date.now()) / 1000);
-  logger.info(`getEntraIdToken - Got Microsoft access value, expires in ${expires} seconds.`);
+  logger.info("getEntraIdToken - Got Microsoft access value, expires in {Expires} seconds.", expires);
   cache.set(cacheKey, result.accessToken, expires);
   logger.info("getEntraIdToken - Access value stored in cache");
 

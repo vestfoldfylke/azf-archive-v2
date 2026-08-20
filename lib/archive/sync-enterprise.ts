@@ -36,8 +36,8 @@ const syncEnterprise = async (enterprise, context) => {
           },
           context
         );
-      } catch (_error) {
-        logger.warn(`syncEnterprise - Sending mail failed when trying to alert about duplicate enterprise with enterprisenumber ${enterprise.EnterpriseNumber}`);
+      } catch (error) {
+        logger.errorException(error, "syncEnterprise - Sending mail failed when trying to alert about duplicate enterprise with EnterpriseNumber {EnterpriseNumber}", enterprise.EnterpriseNumber);
       }
     }
 

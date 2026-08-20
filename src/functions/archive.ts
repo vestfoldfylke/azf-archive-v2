@@ -2,6 +2,7 @@ import { app, type HttpRequest, type HttpResponseInit, type InvocationContext } 
 import { logger } from "@vestfoldfylke/loglady";
 import callArchive from "../../lib/call-archive.js";
 import callArchiveTemplate from "../../lib/call-archive-template.js";
+import HTTPError from "../../lib/http-error.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
 import { updateContext } from "../middleware/async-local-context.js";
@@ -32,9 +33,9 @@ const archiveHandler = async (request: HttpRequest, context: InvocationContext):
   let body: ArchiveBody;
   try {
     body = (await request.json()) as ArchiveBody;
-  } catch {
-    const msg = "Please pass a request body";
-    logger.error(msg);
+  } catch (error) {
+    const msg = "Please pass a valid request body";
+    logger.errorException(error, msg);
     return httpResponse(400, msg);
   }
   if (!body) {
@@ -55,19 +56,14 @@ const archiveHandler = async (request: HttpRequest, context: InvocationContext):
     return httpResponse(400, msg);
   }
 
-  try {
-    JSON.parse(JSON.stringify(parameter));
-  } catch {
-    const msg = 'Parameter "parameter" must be valid json!';
-    logger.error(msg);
-    return httpResponse(400, msg);
-  }
-  try {
-    if (options) JSON.parse(JSON.stringify(options));
-  } catch {
-    const msg = 'Parameter "options" must be valid json!';
-    logger.error(msg);
-    return httpResponse(400, msg);
+  if (options) {
+    try {
+      JSON.parse(JSON.stringify(options));
+    } catch (error) {
+      const msg = 'Parameter "options" must be valid json!';
+      logger.errorException(error, msg);
+      return httpResponse(400, msg);
+    }
   }
 
   updateContext({
@@ -80,9 +76,13 @@ const archiveHandler = async (request: HttpRequest, context: InvocationContext):
       const archiveResult = await callArchive({ service, method, parameter, options }, context);
       return httpResponse(200, archiveResult);
     } catch (error) {
-      const err = error as { stack?: string; toString: () => string };
-      logger.error(`Raw archive call failed - ${err.stack || err.toString()}`);
-      return httpResponse(500, err as Error);
+      if (error instanceof HTTPError) {
+        logger.errorException(error, "Raw archive call failed - Status: {Status} - Data: {@Data}", error.statusCode, error.data as object);
+        return httpResponse(500, error);
+      }
+
+      logger.errorException(error, "Raw archive call failed");
+      return httpResponse(500, error);
     }
   }
 
@@ -91,9 +91,13 @@ const archiveHandler = async (request: HttpRequest, context: InvocationContext):
       const templateResult = await callArchiveTemplate({ system, template, parameter, getExample, demoRun }, context);
       return httpResponse(200, templateResult);
     } catch (error) {
-      const err = error as { stack?: string; toString: () => string };
-      logger.error(`Template archive call failed - ${err.stack || err.toString()}`);
-      return httpResponse(500, err as Error);
+      if (error instanceof HTTPError) {
+        logger.errorException(error, "Template archive call failed - Status: {Status} - {@Data}", error.statusCode, error.data as object);
+        return httpResponse(500, error);
+      }
+
+      logger.errorException(error, "Template archive call failed");
+      return httpResponse(500, error);
     }
   }
 

@@ -34,7 +34,7 @@ const syncElevmappe = async (privatePerson, context) => {
         return mappe.CaseNumber;
       });
       mailStr += `</ul><br>Roboten ønsker seg <strong>${elevmappeRes[0].CaseNumber}</strong> som gjeldende elevmappe.<br><br>Roboten ordner resten selv når dette er ryddet opp.<br><br>Tusen takk!`;
-      logger.warn(`Found several elevmapper on ssn ${ssn} - ${caseNumbers}`);
+      logger.warn("Found several elevmapper on ssn {Ssn} - CaseNumbers: {@CaseNumbers}", ssn, caseNumbers);
       await sendmail(
         {
           to: toArchive,
@@ -53,16 +53,12 @@ const syncElevmappe = async (privatePerson, context) => {
     if (needsUpdate) {
       // PrivatePerson was updated or elevmappe was not correct, update elevmappe as well
       logger.info(
-        [
-          "syncElevmappe",
-          `Elevmappe "${elevmappeRes[0].CaseNumber}" metadata is different from person info (name, ssn, streetAddress), or has wrong case-metadata (title, unofficialTitle)), will update to match person info and case-metadata`
-        ]
-          .map(String)
-          .join(" - ")
+        "syncElevmappe - Elevmappe '{CaseNumber}' metadata is different from person info (name, ssn, streetAddress), or has wrong case-metadata (title, unofficialTitle)), will update to match person info and case-metadata",
+        elevmappeRes[0].CaseNumber
       );
       return await callArchiveTemplate({ system: "elevmappe", template: "update-elevmappe", parameter: { firstName, lastName, recno, caseNumber: elevmappeRes[0].CaseNumber } }, context);
     }
-    logger.info(`syncElevmappe - PrivatePerson was not updated, and elevmappe-metadata on case "${elevmappeRes[0].CaseNumber}" was correct, no need to update elevmappe`);
+    logger.info("syncElevmappe - PrivatePerson was not updated, and elevmappe-metadata on case '{CaseNumber}' was correct, no need to update elevmappe", elevmappeRes[0].CaseNumber);
     return { Recno: elevmappeRes[0].Recno, CaseNumber: elevmappeRes[0].CaseNumber };
   }
   if (elevmappeRes.length === 0) {
@@ -71,7 +67,7 @@ const syncElevmappe = async (privatePerson, context) => {
     return await callArchiveTemplate({ system: "elevmappe", template: "create-elevmappe", parameter: { firstName, lastName, ssn, recno } }, context);
   }
   // Hit kommer vi egt aldri altså
-  logger.error(`syncElevmappe - Several elevmapper found on social security number: ${ssn}, send to arkivarer for handling`);
+  logger.error("syncElevmappe - Several elevmapper found on social security number: {Ssn}, send to arkivarer for handling", ssn);
   throw new HTTPError(500, `Several elevmapper found on social security number: ${ssn}, send to arkivarer for handling`);
 };
 

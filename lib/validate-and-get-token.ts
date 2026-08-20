@@ -8,7 +8,7 @@ export const validateAndGetToken = (token: string | null): DecodedAccessTokenRes
   const decoded: DecodedAccessToken = decodeAccessToken(token);
 
   if (!decoded.verified) {
-    logger.warn(`Token is not valid - ${decoded.msg}`);
+    logger.warn("Token is not valid - {Message}", decoded.msg);
     return {
       decoded,
       errorResponse: httpResponse(401, decoded.msg ?? "Token is not valid")
@@ -17,7 +17,7 @@ export const validateAndGetToken = (token: string | null): DecodedAccessTokenRes
 
   logger.info("Validating role");
   if (!decoded.roles.includes(ARCHIVE_ROLE)) {
-    logger.info("Missing required role for access");
+    logger.warn("Missing required role for access. Roles present: {@Roles}", decoded.roles);
     return {
       decoded,
       errorResponse: httpResponse(403, "Missing required role for access")

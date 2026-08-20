@@ -1,6 +1,7 @@
 import { app, type HttpRequest, type HttpResponseInit, type InvocationContext } from "@azure/functions";
 import { logger } from "@vestfoldfylke/loglady";
 import { getName, getSyncPrivatePersonMethod, syncPrivatePerson } from "../../lib/archive/sync-private-person.js";
+import HTTPError from "../../lib/http-error.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
 import { updateContext } from "../middleware/async-local-context.js";
@@ -57,18 +58,22 @@ const syncPrivatePersonHandler = async (request: HttpRequest, context: Invocatio
     logger.info("Syncing PrivatePerson");
     getSyncPrivatePersonMethod(syncPrivatePersonData);
     const privatePerson = await syncPrivatePerson(syncPrivatePersonData, context);
-    logger.info("Succesfully synced PrivatePerson");
+    logger.info("Successfully synced PrivatePerson");
+
     return httpResponse(200, { privatePerson });
   } catch (error) {
-    const err = error as { stack?: string; toString: () => string };
-    logger.error(`error when syncing privatePerson - ${err.stack || err.toString()}`);
-    return httpResponse(500, err as Error);
+    if (error instanceof HTTPError) {
+      logger.errorException(error, "Error when syncing privatePerson - Status: {Status} - Data: {@Data}", error.statusCode, error.data as object);
+      return httpResponse(error.statusCode, error);
+    }
+
+    logger.errorException(error, "Error when syncing privatePerson");
+    return httpResponse(500, error);
   }
 };
 
 app.http("SyncPrivatePerson", {
   authLevel: "anonymous",
   methods: ["POST"],
-  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> =>
-    await logContextHandling(request, context, syncPrivatePersonHandler)
+  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => await logContextHandling(request, context, syncPrivatePersonHandler)
 });

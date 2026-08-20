@@ -8,15 +8,17 @@ const { url, branchUrl } = BRREG;
 const getBrregData = async (orgnr: string, _context?: unknown): Promise<unknown> => {
   try {
     return await requestJson(`${url}${orgnr}`);
-  } catch (_error) {
+  } catch {
     try {
       return await requestJson(`${branchUrl}${orgnr}`);
-    } catch (err) {
-      const status = err instanceof HTTPError ? err.statusCode : 500;
-      const e = err as { message?: string; toString: () => string };
-      const data = err instanceof HTTPError ? (err.data ?? err.message) : e.message || e.toString();
-      logger.error(`get-brreg-data - ${status} - ${data}`);
-      throw new HTTPError(status, typeof data === "string" ? data : "Brreg lookup failed");
+    } catch (error) {
+      if (error instanceof HTTPError) {
+        logger.errorException(error, "get-brreg-data - Status: {Status} - Data: {@Data}", error.statusCode, error.data as object);
+        throw new HTTPError(error.statusCode, error.message || "Brreg lookup failed");
+      }
+
+      logger.errorException(error, "get-brreg-data");
+      throw new HTTPError(500, (error as Error).message);
     }
   }
 };

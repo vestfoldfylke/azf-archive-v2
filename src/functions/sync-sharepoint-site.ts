@@ -8,7 +8,7 @@ import { updateContext } from "../middleware/async-local-context.js";
 import { logContextHandling } from "../middleware/logcontext-handling.js";
 
 type SharePointBody = {
-  siteUrl?: unknown;
+  siteUrl?: string;
   projectTitle?: unknown;
   responsiblePersonEmail?: unknown;
   projectNumber?: unknown;
@@ -77,20 +77,24 @@ const syncSharepointSiteHandler = async (request: HttpRequest, context: Invocati
     caseType
   };
   try {
-    logger.info(`Trying to sync SharePointSite: SiteUrl: ${siteUrl as string}`);
+    logger.info("Trying to sync SharePointSite: SiteUrl: {SiteUrl}", siteUrl);
     const result = await syncSharePointSite(input, context);
-    logger.info(`Succesfully synced SharePointSite. SiteUrl: ${siteUrl as string}`);
+    logger.info("Successfully synced SharePointSite. SiteUrl: {SiteUrl}", siteUrl);
+
     return httpResponse(200, result);
   } catch (error) {
-    const err = error as { stack?: string; toString: () => string };
-    logger.error(`error when syncing SharePointSite - ${err.stack || err.toString()}`);
-    return httpResponse(500, err as Error);
+    if (error instanceof HTTPError) {
+      logger.errorException(error, "Error when syncing SharePointSite - Status: {Status} - Data: {@Data}", error.statusCode, error.data as object);
+      return httpResponse(error.statusCode, error);
+    }
+
+    logger.errorException(error, "Error when syncing privatePerson");
+    return httpResponse(500, error);
   }
 };
 
 app.http("SyncSharepointSite", {
   authLevel: "anonymous",
   methods: ["POST"],
-  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> =>
-    await logContextHandling(request, context, syncSharepointSiteHandler)
+  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => await logContextHandling(request, context, syncSharepointSiteHandler)
 });

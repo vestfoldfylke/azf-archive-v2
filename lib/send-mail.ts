@@ -1,5 +1,6 @@
 import { logger } from "@vestfoldfylke/loglady";
 import { MAIL } from "../config.js";
+import HTTPError from "./http-error.js";
 import { requestJson } from "./request-json.js";
 
 type MailOptions = { to: string | string[]; subject: string; body: string };
@@ -28,11 +29,15 @@ export default async (options: MailOptions, _context?: unknown): Promise<unknown
       body: payload,
       headers: { "x-functions-key": secret as string }
     });
-    logger.info(`send-mail - mail sent - to - ${payload.to} - cc - ${cc} - bcc - ${bcc}`);
+    logger.info("send-mail - mail sent - to - {@To} - cc - {@Cc} - bcc - {@Bcc}", to, cc, bcc);
     return data;
   } catch (error) {
-    const err = error as { data?: unknown; stack?: string; toString: () => string };
-    logger.error(`send-mail - failed to send mail - to - ${payload.to} - cc - ${cc} - bcc - ${bcc} - ${err.data || err.stack || err.toString()}`);
+    if (error instanceof HTTPError) {
+      logger.errorException(error, "send-mail - failed to send mail - to - {@To} - cc - {@Cc} - bcc - {@Bcc} - Data: {@Data}", to, cc, bcc, error.data as object);
+      return null;
+    }
+
+    logger.errorException(error, "send-mail - failed to send mail - to - {@To} - cc - {@Cc} - bcc - {@Bcc}", to, cc, bcc);
     return null;
   }
 };

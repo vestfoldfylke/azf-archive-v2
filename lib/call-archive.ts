@@ -36,7 +36,7 @@ const constructRequest = (config: { service: string; method: string }): { url: s
 export default async (archiveData: CallArchiveInput, _context?: unknown): Promise<unknown> => {
   const { parameter, options, service, method } = archiveData;
   const { url, headers } = constructRequest(archiveData);
-  logger.info(`Sending request to P360 - service - ${service} - method - ${method}`);
+  logger.info("Sending request to P360 - service - {Service} - method - {Method}", service, method);
 
   const isGet = method.toLowerCase().startsWith("get");
   if (isGet && !parameter.SortingCriterion) {
@@ -44,7 +44,7 @@ export default async (archiveData: CallArchiveInput, _context?: unknown): Promis
   }
 
   const data = (await requestJson(url, { method: "POST", body: { parameter }, headers })) as SIFResponse;
-  logger.info(`Got response - service - ${service} - method - ${method}`);
+  logger.info("Got response - service - {Service} - method - {Method}", service, method);
 
   if (archiveData.method.toLowerCase() === "ping") {
     logger.info("Ping pong, quick return");
@@ -60,20 +60,20 @@ export default async (archiveData: CallArchiveInput, _context?: unknown): Promis
   if (isGet && Array.isArray(result)) {
     let page = 1;
     const totalPages = data.TotalPageCount || 1;
-    logger.info(`Request was a get, total pages: ${totalPages}`);
+    logger.info("Request was a get, total pages: {TotalPageCount}", totalPages);
     let finished = totalPages <= 1 || Boolean(options?.limit && options.limit <= result.length);
     if (finished) {
       if (totalPages <= 1) {
         logger.info("Only one page, no need to fetch more");
       } else {
-        logger.info(`Limit reached (${options?.limit} items), not fetching more`);
+        logger.info("Limit reached ({Limit} items), not fetching more", options?.limit);
       }
     }
     while (!finished) {
-      logger.info(`More boring stuff here, fetching page ${page + 1} of ${totalPages}`);
+      logger.info("More boring stuff here, fetching page {PageNumber} of {TotalPageCount}", page + 1, totalPages);
       parameter.Page = page;
       const pageResult = (await requestJson(url, { method: "POST", body: { parameter }, headers })) as SIFResponse;
-      logger.info(`Got response - service - ${service} - method - ${method} - page - ${page + 1}`);
+      logger.info("Got response - service - {Service} - method - {Method} - page - {PageNumber}", service, method, page + 1);
 
       if (hasSifError(pageResult)) {
         throw new HTTPError(500, repackUglySifError(pageResult).ErrorMessage || "Archive call failed");
@@ -86,9 +86,9 @@ export default async (archiveData: CallArchiveInput, _context?: unknown): Promis
         if (page >= totalPages) {
           if (result.length !== data.TotalCount)
             throw new HTTPError(500, `P360 said there was ${data.TotalCount} items, but we got ${result.length} items after fetching ${page} pages - call support`);
-          logger.info(`Got all ${page} of ${totalPages} pages. Let us pray and return`);
+          logger.info("Got all {PageNumber} of {TotalPageCount} pages. Let us pray and return", page, totalPages);
         } else {
-          logger.info(`Limit reached (${options?.limit} items), not fetching more`);
+          logger.info("Limit reached ({Limit} items), not fetching more", options?.limit);
         }
       }
     }

@@ -56,7 +56,7 @@ const syncEmployee = async (privatePerson, fintfolkEmployee, _manualManagerEmail
   for (const unit of mainPosition.strukturlinje) {
     // Check if unit has a leader in FINT
     if (!unit.leder?.ansattnummer) {
-      logger.warn(`No manager found in FINT for unit ${unit.kortnavn || unit.navn}, going up one level`);
+      logger.warn("No manager found in FINT for unit {Unit}, going up one level", unit.kortnavn || unit.navn);
       level--;
       movedUp = true;
       movedUpTimes++;
@@ -85,20 +85,20 @@ const syncEmployee = async (privatePerson, fintfolkEmployee, _manualManagerEmail
       context
     );
     if (enterpriseMatches.length === 1) {
-      logger.info(`Found match for enterprise with ExternalID ${unit.organisasjonsKode}`);
+      logger.info("Found match for enterprise with ExternalID {OrganisasjonsKode}", unit.organisasjonsKode);
       enterpriseMatch = true;
     }
     if (!enterpriseMatch && unit.kortnavn) {
       // If not found, trying with shortcode
-      logger.info(`No unique match for enterprise with ExternalID ${unit.organisasjonsKode}, trying with shortcode`);
+      logger.info("No unique match for enterprise with ExternalID {OrganisasjonsKode}, trying with shortcode", unit.organisasjonsKode);
       enterpriseMatches = await callArchive({ service: "ContactService", method: "GetEnterprises", parameter: { Initials: unit.kortnavn, Active: true, Categories: ["Intern"] } }, context);
       if (enterpriseMatches.length === 1) {
-        logger.info(`Found match for enterprise with shortcode ${unit.kortnavn}`);
+        logger.info("Found match for enterprise with shortcode {Kortnavn}", unit.kortnavn);
         enterpriseMatch = true;
       }
     }
     if (!enterpriseMatch) {
-      logger.info(`Could not find enterpriseMatch for unit ${unit.kortnavn || unit.navn}, trying one level up`);
+      logger.info("Could not find enterpriseMatch for unit {Unit}, trying one level up", unit.kortnavn || unit.navn);
       level--; // we move up in the structure
       movedUp = true;
       movedUpTimes++;
@@ -108,16 +108,16 @@ const syncEmployee = async (privatePerson, fintfolkEmployee, _manualManagerEmail
     let managerMatch = false;
     const managerMatches = await callArchive({ service: "ContactService", method: "GetContactPersons", parameter: { email: unit.leder.kontaktEpostadresse, Active: true, Categories: ["Intern"] } });
     if (managerMatches.length === 1) {
-      logger.info(`Found ContactPerson for manager (ansattnummer) ${unit.leder.ansattnummer} in unit ${unit.kortnavn || unit.navn} - great success`);
+      logger.info("Found ContactPerson for manager (ansattnummer) {Ansattnummer} in unit {Unit} - great success", unit.leder.ansattnummer, unit.kortnavn || unit.navn);
       managerMatch = true;
     }
     if (enterpriseMatch && managerMatch) {
-      logger.info(`Wihoo found both enterprise and manager in archive for unit ${unit.kortnavn || unit.navn} - great success`);
+      logger.info("Wihoo found both enterprise and manager in archive for unit {Unit} - great success", unit.kortnavn || unit.navn);
       responsibleEnterprise = enterpriseMatches[0];
       archiveManager = managerMatches[0];
       break;
     }
-    logger.info(`Could not find manager in P360 for unit ${unit.kortnavn || unit.navn}, trying one level up`);
+    logger.info("Could not find manager in P360 for unit {Unit}, trying one level up", unit.kortnavn || unit.navn);
     level--; // we move up in the structure
     movedUp = true;
     movedUpTimes++;

@@ -23,16 +23,16 @@ export default async (sharePointData, context) => {
     result.projectNumber = createProject.ProjectNumber;
     result.responsiblePersonEmail = responsiblePersonEmail;
     status.project = "successfully created";
-    logger.info(`syncSharePointSite - Project created. Project number: ${result.projectNumber}`);
+    logger.info("syncSharePointSite - Project created. Project number: {ProjectNumber}", result.projectNumber);
   } else {
     // contains project number. External ID cannot be updated. Only responisblePerson and Title.
-    logger.info(`syncSharePointSite - project already exists. Project number: ${projectNumber}`);
+    logger.info("syncSharePointSite - project already exists. Project number: {ProjectNumber}", projectNumber);
     const getProject = await callArchiveTemplate({ system: "archive", template: "get-project", parameter: { projectNumber } }, context); // Returns projectNumber from 360
     if (!getProject.ProjectNumber) throw new Error(`Project "${projectNumber}" does not exist.`);
     result.projectNumber = getProject.ProjectNumber;
     result.responsiblePersonEmail = getProject.ResponsiblePerson.Email;
     status.project = "found";
-    logger.info(`Found project. Projectnumber: ${result.projectNumber}`);
+    logger.info("Found project. Projectnumber: {ProjectNumber}", result.projectNumber);
   }
   result.projectName = projectTitle;
 
@@ -52,15 +52,15 @@ export default async (sharePointData, context) => {
         },
         context
       );
-      logger.warn(`syncSharePointSite - Found case in P360 but status is Utgår. Will use the case anyway. Case number: ${getCase.CaseNumber}. Sent mail to archive administrators`);
+      logger.warn("syncSharePointSite - Found case in P360 but status is Utgår. Will use the case anyway. Case number: {CaseNumber}. Sent mail to archive administrators", getCase.CaseNumber);
     }
-    logger.info(`syncSharePointSite - Case already exists. Case number: ${getCase.CaseNumber}`);
+    logger.info("syncSharePointSite - Case already exists. Case number: {CaseNumber}", getCase.CaseNumber);
     result.caseNumber = getCase.CaseNumber;
     result.caseTitle = getCase.Title;
     status.case = "found";
   } else {
     const template = caseType ? `create-case-${caseType}` : "create-case";
-    logger.info(`syncSharePointSite - createCase - using template: ${template}`);
+    logger.info("syncSharePointSite - createCase - using template: {TemplateName}", template);
     const createCase = await callArchiveTemplate(
       { system: "sharepoint", template, parameter: { caseTitle, projectNumber: result.projectNumber, caseExternalId, accessGroup, paragraph, responsiblePersonEmail: result.responsiblePersonEmail } },
       context
@@ -68,7 +68,7 @@ export default async (sharePointData, context) => {
     result.caseNumber = createCase.CaseNumber;
     result.caseTitle = caseTitle;
     status.case = "successfully created";
-    logger.info(`syncSharePointSite - Case created. Case number: ${result.caseNumber}`);
+    logger.info("syncSharePointSite - Case created. Case number: {CaseNumber}", result.caseNumber);
   }
 
   // Set result.msg with status

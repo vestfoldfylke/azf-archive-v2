@@ -2,6 +2,7 @@ import { app, type HttpRequest, type HttpResponseInit, type InvocationContext } 
 import { logger } from "@vestfoldfylke/loglady";
 import { syncEnterprise } from "../../lib/archive/sync-enterprise.js";
 import { getBrregData } from "../../lib/get-brreg-data.js";
+import HTTPError from "../../lib/http-error.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { repackBrreg } from "../../lib/repack-brreg-result.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
@@ -41,24 +42,29 @@ const syncEnterpriseHandler = async (request: HttpRequest, context: InvocationCo
   }
 
   try {
-    logger.info(`Fetching brregdata for orgnr: ${orgnr}`);
+    logger.info("Fetching brregdata for orgnr: {Orgnr}", orgnr);
     const brregEnterprise = await getBrregData(orgnr, context);
-    logger.info(`Got brregdata for orgnr: ${orgnr}, repacking result`);
+    logger.info("Got brregdata for orgnr: {Orgnr}, repacking result", orgnr);
+
     const repackedEnterprise = repackBrreg(brregEnterprise);
-    logger.info(`Syncing enterprise orgnr: ${orgnr} in archive`);
+    logger.info("Syncing enterprise orgnr: {Orgnr} in archive", orgnr);
     const enterprise = await syncEnterprise(repackedEnterprise, context);
-    logger.info(`Successfully synced enterprise orgnr: ${orgnr} in archive`);
+    logger.info("Successfully synced enterprise orgnr: {Orgnr} in archive", orgnr);
+
     return httpResponse(200, { repackedEnterprise, enterprise });
   } catch (error) {
-    const err = error as { stack?: string; toString: () => string };
-    logger.error(`error when syncing enterprise - ${err.stack || err.toString()}`);
-    return httpResponse(500, err as Error);
+    if (error instanceof HTTPError) {
+      logger.errorException(error, "Error when syncing enterprise - Status: {Status} - Data: {@Data}", error.statusCode, error.data as object);
+      return httpResponse(error.statusCode, error);
+    }
+
+    logger.errorException(error, "Error when syncing enterprise");
+    return httpResponse(500, error);
   }
 };
 
 app.http("SyncEnterprise", {
   authLevel: "anonymous",
   methods: ["POST"],
-  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> =>
-    await logContextHandling(request, context, syncEnterpriseHandler)
+  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => await logContextHandling(request, context, syncEnterpriseHandler)
 });
