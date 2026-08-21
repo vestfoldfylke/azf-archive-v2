@@ -78,7 +78,7 @@ const syncSharepointSiteHandler = async (request: HttpRequest, context: Invocati
   };
   try {
     logger.info("Trying to sync SharePointSite: SiteUrl: {SiteUrl}", siteUrl);
-    const result = await syncSharePointSite(input, context);
+    const result = await syncSharePointSite(input);
     logger.info("Successfully synced SharePointSite. SiteUrl: {SiteUrl}", siteUrl);
 
     return httpResponse(200, result);

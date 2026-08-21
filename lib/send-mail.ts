@@ -7,7 +7,7 @@ type MailOptions = { to: string | string[]; subject: string; body: string };
 
 const { bcc, cc, from, signature, url, secret, templateName } = MAIL;
 
-export default async (options: MailOptions, _context?: unknown): Promise<unknown> => {
+export default async (options: MailOptions): Promise<unknown> => {
   const { to, subject, body } = options;
   const payload: Record<string, unknown> = {
     to,

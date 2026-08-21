@@ -95,7 +95,7 @@ const repackBirthdate = (birthdate) => {
   };
 };
 
-const syncPrivatePerson = async (syncPrivatePersonData, context) => {
+const syncPrivatePerson = async (syncPrivatePersonData) => {
   const { ssn, name, birthdate, fakeSsn, gender, streetAddress, zipCode, zipPlace, forceUpdate, manualData, email, phoneNumber } = syncPrivatePersonData;
 
   const syncPrivatePersonMethod = getSyncPrivatePersonMethod(syncPrivatePersonData);
@@ -264,8 +264,7 @@ const syncPrivatePerson = async (syncPrivatePersonData, context) => {
           to: toArchiveAdministrator,
           subject: "Jeg har funnet flere privatpersoner med samme fødselsnummer",
           body: mailStrBlock
-        },
-        context
+        }
       );
       logger.warn("syncPrivatePerson - Found several privatePerson on the same social security number: {Ssn}, sent mail to arkivarer for handling", ssnToUse);
     }
@@ -377,8 +376,7 @@ const syncPrivatePerson = async (syncPrivatePersonData, context) => {
         to: toArchiveAdministrator,
         subject: "Håndtert en privatperson med adressebeskyttelse",
         body: mailStrBlock
-      },
-      context
+      }
     );
     logger.warn("syncPrivatePerson - Handled privatePerson with addressProtection, Recno: {Recno}", privatePerson.recno);
   }

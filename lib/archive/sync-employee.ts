@@ -29,7 +29,7 @@ const repackEnterprise = (responsibleEnterprise) => {
   return repacked;
 };
 
-const syncEmployee = async (privatePerson, fintfolkEmployee, _manualManagerEmail, context) => {
+const syncEmployee = async (privatePerson, fintfolkEmployee, _manualManagerEmail) => {
   const { ssn } = privatePerson;
   if (!ssn) {
     logger.error('Missing required parameter "privatePerson.ssn"');
@@ -157,8 +157,7 @@ Ha en fortyllende dag 🪄
         to: toArchiveAdministrator,
         subject: "Arkiveringsroboten klarte ikke finne korrekt leder / virksomhet for ansatt",
         body: mailBody
-      },
-      context
+      }
     );
   }
 

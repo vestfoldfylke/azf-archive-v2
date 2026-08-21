@@ -7,7 +7,7 @@ const { toArchiveAdministrator } = MAIL;
 
 import callArchiveTemplate from "../call-archive-template.js";
 
-export default async (sharePointData, context) => {
+export default async (sharePointData) => {
   const { siteUrl, projectTitle, responsiblePersonEmail, projectNumber, caseExternalId, caseTitle, accessGroup, paragraph, caseType } = sharePointData;
   const result = {};
   const status = {
@@ -49,8 +49,7 @@ export default async (sharePointData, context) => {
           to: toArchiveAdministrator,
           subject: "Oppdaget SharePoint-sak med status Utgår",
           body: mailStrBlock
-        },
-        context
+        }
       );
       logger.warn("syncSharePointSite - Found case in P360 but status is Utgår. Will use the case anyway. Case number: {CaseNumber}. Sent mail to archive administrators", getCase.CaseNumber);
     }

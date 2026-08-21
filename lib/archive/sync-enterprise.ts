@@ -7,7 +7,7 @@ import sendmail from "../send-mail.js";
 
 const { toArchiveAdministrator } = MAIL;
 
-const syncEnterprise = async (enterprise, context) => {
+const syncEnterprise = async (enterprise) => {
   const result = {
     ...enterprise,
     recno: 0,
@@ -33,8 +33,7 @@ const syncEnterprise = async (enterprise, context) => {
             to: toArchiveAdministrator,
             subject: "Arkiveringsroboten har funnet duplikate virksomheter i P360",
             body: mailStrBlock
-          },
-          context
+          }
         );
       } catch (error) {
         logger.errorException(error, "syncEnterprise - Sending mail failed when trying to alert about duplicate enterprise with EnterpriseNumber {EnterpriseNumber}", enterprise.EnterpriseNumber);

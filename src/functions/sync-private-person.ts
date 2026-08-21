@@ -57,7 +57,7 @@ const syncPrivatePersonHandler = async (request: HttpRequest, context: Invocatio
   try {
     logger.info("Syncing PrivatePerson");
     getSyncPrivatePersonMethod(syncPrivatePersonData);
-    const privatePerson = await syncPrivatePerson(syncPrivatePersonData, context);
+    const privatePerson = await syncPrivatePerson(syncPrivatePersonData);
     logger.info("Successfully synced PrivatePerson");
 
     return httpResponse(200, { privatePerson });

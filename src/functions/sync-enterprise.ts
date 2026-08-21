@@ -43,12 +43,12 @@ const syncEnterpriseHandler = async (request: HttpRequest, context: InvocationCo
 
   try {
     logger.info("Fetching brregdata for orgnr: {Orgnr}", orgnr);
-    const brregEnterprise = await getBrregData(orgnr, context);
+    const brregEnterprise = await getBrregData(orgnr);
     logger.info("Got brregdata for orgnr: {Orgnr}, repacking result", orgnr);
 
     const repackedEnterprise = repackBrreg(brregEnterprise);
     logger.info("Syncing enterprise orgnr: {Orgnr} in archive", orgnr);
-    const enterprise = await syncEnterprise(repackedEnterprise, context);
+    const enterprise = await syncEnterprise(repackedEnterprise);
     logger.info("Successfully synced enterprise orgnr: {Orgnr} in archive", orgnr);
 
     return httpResponse(200, { repackedEnterprise, enterprise });

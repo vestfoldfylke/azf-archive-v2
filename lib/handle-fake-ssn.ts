@@ -23,7 +23,7 @@ const getLastName = (name: string): string => {
   return nameList[nameList.length - 1];
 };
 
-const handleFakeSsn = async (birthdate: string, gender: string, name: string, context?: unknown): Promise<{ resultFakeSsn: string | undefined; privatePersonResult: unknown }> => {
+const handleFakeSsn = async (birthdate: string, gender: string, name: string): Promise<{ resultFakeSsn: string | undefined; privatePersonResult: unknown }> => {
   if (!name) {
     throw new HTTPError(400, 'Missing required parameter "lastName"');
   }

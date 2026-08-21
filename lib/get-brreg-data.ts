@@ -5,7 +5,7 @@ import { requestJson } from "./request-json.js";
 
 const { url, branchUrl } = BRREG;
 
-const getBrregData = async (orgnr: string, _context?: unknown): Promise<unknown> => {
+const getBrregData = async (orgnr: string): Promise<unknown> => {
   try {
     return await requestJson(`${url}${orgnr}`);
   } catch {

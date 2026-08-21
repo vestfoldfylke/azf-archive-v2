@@ -77,7 +77,7 @@ const syncEmployeeHandler = async (request: HttpRequest, context: InvocationCont
   try {
     logger.info("Syncing PrivatePerson");
     getSyncPrivatePersonMethod(syncPrivatePersonData);
-    privatePerson = await syncPrivatePerson(syncPrivatePersonData, context);
+    privatePerson = await syncPrivatePerson(syncPrivatePersonData);
     logger.info("Successfully synced PrivatePerson");
   } catch (error) {
     if (error instanceof HTTPError) {
@@ -91,7 +91,7 @@ const syncEmployeeHandler = async (request: HttpRequest, context: InvocationCont
 
   try {
     logger.info("Syncing employee");
-    const { responsibleEnterprise, archiveManager } = await syncEmployee(privatePerson, fintfolkEmployee, manualManagerEmail, context);
+    const { responsibleEnterprise, archiveManager } = await syncEmployee(privatePerson, fintfolkEmployee, manualManagerEmail);
     logger.info("Successfully synced employee");
     return httpResponse(200, { privatePerson, archiveManager, responsibleEnterprise });
   } catch (error) {

@@ -59,7 +59,7 @@ const syncElevmappeHandler = async (request: HttpRequest, context: InvocationCon
   try {
     logger.info("Syncing PrivatePerson");
     getSyncPrivatePersonMethod(syncPrivatePersonData);
-    privatePerson = await syncPrivatePerson(syncPrivatePersonData, context);
+    privatePerson = await syncPrivatePerson(syncPrivatePersonData);
     logger.info("Successfully synced PrivatePerson");
   } catch (error) {
     if (error instanceof HTTPError) {
@@ -73,7 +73,7 @@ const syncElevmappeHandler = async (request: HttpRequest, context: InvocationCon
 
   try {
     logger.info("Syncing elevmappe");
-    const elevmappe = await syncElevmappe(privatePerson, context);
+    const elevmappe = await syncElevmappe(privatePerson);
     logger.info("Successfully synced elevmappe");
     return httpResponse(200, { privatePerson, elevmappe });
   } catch (error) {

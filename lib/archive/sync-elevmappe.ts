@@ -6,7 +6,7 @@ import sendmail from "../send-mail.js";
 
 const { toArchive } = MAIL;
 
-const syncElevmappe = async (privatePerson, context) => {
+const syncElevmappe = async (privatePerson) => {
   const { ssn, firstName, lastName, streetAddress, recno, updated } = privatePerson;
   if (!ssn) {
     logger.error('Missing required parameter "privatePerson.ssn"');
@@ -40,8 +40,7 @@ const syncElevmappe = async (privatePerson, context) => {
           to: toArchive,
           subject: "Flere elevmapper på en elev",
           body: mailStr
-        },
-        context
+        }
       );
     }
     const needsUpdate =
