@@ -1,43 +1,71 @@
-const hasSifError = (response) => {
-  if (Object.hasOwn(response, "Successful") && !response.Successful) return true;
-  if (Object.hasOwn(response, "ErrorMessage") && typeof response.ErrorMessage === "string" && response.ErrorMessage.trim().length > 0 && response.ErrorMessage !== "\n") return true;
-  return false;
+import type { SIFOptions, SIFResponse } from "../types/sif.js";
+
+type SIFResult = {
+  Status: string;
 };
-const repackUglySifError = (response) => {
+
+const excludeRepackProperties: string[] = ["ErrorDetails", "ErrorMessage", "Successful", "TotalCount", "TotalPageCount", "NextDeltaLastDate"];
+
+const hasSifError = (response: SIFResponse): boolean => {
+  if (Object.hasOwn(response, "Successful") && !response.Successful) {
+    return true;
+  }
+
+  return Object.hasOwn(response, "ErrorMessage") && typeof response.ErrorMessage === "string" && response.ErrorMessage.trim().length > 0 && response.ErrorMessage !== "\n"
+};
+const repackUglySifError = (response: SIFResponse): SIFResponse => {
   response.ErrorMessage =
     response.ErrorMessage && typeof response.ErrorMessage === "string" && response.ErrorMessage.includes("Exception:")
       ? response.ErrorMessage.split("Exception:")[1].split("<operation>")[0]
       : response.ErrorMessage;
-  response.ErrorMessage = response.ErrorMessage.replace(/\\"/g, "").replace(/'/g, "").replace(/"/g, "").replace(/"/g, "`").trim();
+
+  if (response.ErrorMessage) {
+    response.ErrorMessage = response.ErrorMessage.replace(/\\"/g, "").replace(/'/g, "").replace(/"/g, "").replace(/"/g, "`").trim();
+  }
+
   return response;
 };
 
-const repackSifResult = (sifResult) => {
-  const excludeProperties = ["ErrorDetails", "ErrorMessage", "Successful", "TotalCount", "TotalPageCount", "NextDeltaLastDate"];
-  const keysToInclude = Object.keys(sifResult).filter((key) => !excludeProperties.includes(key));
-  if (keysToInclude.length === 0) return null; // No data
-  if (keysToInclude.length > 1) return sifResult; // More than one property - return all data WHY did i do this... oh well
+const repackSifResult = (sifResult: SIFResponse): unknown => {
+  const keysToInclude: string[] = Object.keys(sifResult).filter((key: string) => !excludeRepackProperties.includes(key));
+  if (keysToInclude.length === 0) {
+    return null; // No data
+  }
+
+  if (keysToInclude.length > 1) {
+    return sifResult; // More than one property - return all data WHY did i do this... oh well
+  }
+
   return sifResult[keysToInclude[0]];
 };
 
-const filterSifResult = (result, options) => {
-  if (!options) throw new Error("No options provided to filterSifResult");
-  // Only open or exclude expired Cases Option
-  if (options?.onlyOpenCases) {
-    result = result.filter(({ Status }) => Status === "Under behandling");
-  } else if (options?.excludeExpiredCases) {
-    result = result.filter(({ Status }) => Status !== "Utgår");
+const filterSifResult = (result: unknown[], options: SIFOptions): unknown | unknown[] | null => {
+  if (!options) {
+    throw new Error("No options provided to filterSifResult");
   }
+
+  let filteredResult: unknown[] = [...result];
+
+  // Only open or exclude expired Cases Option
+  if (options.onlyOpenCases) {
+    filteredResult = filteredResult.filter((e: unknown) => (e as unknown as SIFResult).Status === "Under behandling");
+  } else if (options.excludeExpiredCases) {
+    filteredResult = filteredResult.filter((e: unknown) => (e as unknown as SIFResult).Status !== "Utgår");
+  }
+
   // Limit options
-  if (options?.limit === 1) {
-    if (result.length > 0) {
-      return result[0];
+  if (options.limit === 1) {
+    if (filteredResult.length > 0) {
+      return filteredResult[0];
     }
+
     return null; // jaja...
   }
-  if (options?.limit > 1) {
-    return result.slice(0, options.limit);
+
+  if (options.limit && options.limit > 1) {
+    return filteredResult.slice(0, options.limit);
   }
+
   return result;
 };
 

@@ -14,7 +14,7 @@ const syncEnterprise = async (enterprise, context) => {
     updated: false,
     created: false
   };
-  const enterpriseRes = await callArchiveTemplate({ system: "archive", template: "get-enterprise", parameter: { orgnr: enterprise.EnterpriseNumber } }, context);
+  const enterpriseRes = await callArchiveTemplate({ system: "archive", template: "get-enterprise", parameter: { orgnr: enterprise.EnterpriseNumber } });
 
   if (enterpriseRes.length === 0) {
     const payload = {
@@ -22,7 +22,7 @@ const syncEnterprise = async (enterprise, context) => {
       method: "SynchronizeEnterprise",
       parameter: enterprise
     };
-    result.recno = await callArchive(payload, context);
+    result.recno = await callArchive(payload);
     result.created = true;
   } else {
     if (enterpriseRes.length > 1) {
@@ -61,7 +61,7 @@ const syncEnterprise = async (enterprise, context) => {
         }
       };
       result.updated = true;
-      result.recno = await callArchive(payload, context);
+      result.recno = await callArchive(payload);
     }
   }
   return result;

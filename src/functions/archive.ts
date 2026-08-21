@@ -5,6 +5,7 @@ import callArchiveTemplate from "../../lib/call-archive-template.js";
 import HTTPError from "../../lib/http-error.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
+import type { SIFOptions } from "../../types/sif.js";
 import { updateContext } from "../middleware/async-local-context.js";
 import { logContextHandling } from "../middleware/logcontext-handling.js";
 
@@ -16,18 +17,21 @@ type ArchiveBody = {
   parameter?: Record<string, unknown>;
   demoRun?: boolean;
   getExample?: boolean;
-  options?: Record<string, unknown>;
+  options?: SIFOptions;
 };
 
 const archiveHandler = async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
-  updateContext({ prefix: "Archive", contextId: context.invocationId });
+  let logPrefix: string = "Archive";
+
+  updateContext({ prefix: logPrefix, contextId: context.invocationId });
 
   const { decoded, errorResponse } = validateAndGetToken(request.headers.get("authorization"));
   if (errorResponse) {
     return errorResponse;
   }
 
-  updateContext({ prefix: `Archive - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`, contextId: context.invocationId });
+  logPrefix = `Archive - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`;
+  updateContext({ prefix: logPrefix, contextId: context.invocationId });
   logger.info("Role validated");
 
   let body: ArchiveBody;
@@ -66,14 +70,12 @@ const archiveHandler = async (request: HttpRequest, context: InvocationContext):
     }
   }
 
-  updateContext({
-    prefix: `Archive - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""} - ${service || system} - ${method || template}`,
-    contextId: context.invocationId
-  });
+  logPrefix += ` - ${service || system} - ${method || template}`;
+  updateContext({ prefix: logPrefix, contextId: context.invocationId });
 
   if (service && method) {
     try {
-      const archiveResult = await callArchive({ service, method, parameter, options }, context);
+      const archiveResult = await callArchive({ service, method, parameter, options });
       return httpResponse(200, archiveResult);
     } catch (error) {
       if (error instanceof HTTPError) {
@@ -88,7 +90,7 @@ const archiveHandler = async (request: HttpRequest, context: InvocationContext):
 
   if (system && template) {
     try {
-      const templateResult = await callArchiveTemplate({ system, template, parameter, getExample, demoRun }, context);
+      const templateResult = await callArchiveTemplate({ system, template, parameter, getExample, demoRun });
       return httpResponse(200, templateResult);
     } catch (error) {
       if (error instanceof HTTPError) {
@@ -108,6 +110,5 @@ app.http("Archive", {
   authLevel: "anonymous",
   methods: ["POST"],
   route: "archive",
-  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> =>
-    await logContextHandling(request, context, archiveHandler)
+  handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => await logContextHandling(request, context, archiveHandler)
 });

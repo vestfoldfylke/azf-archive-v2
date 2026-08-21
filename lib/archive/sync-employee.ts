@@ -80,10 +80,7 @@ const syncEmployee = async (privatePerson, fintfolkEmployee, _manualManagerEmail
     if (!mainResponsibleUnit) mainResponsibleUnit = unit;
     // Get enterprise from archive
     let enterpriseMatch = false;
-    let enterpriseMatches = await callArchive(
-      { service: "ContactService", method: "GetEnterprises", parameter: { ExternalID: unit.organisasjonsKode, Active: true, Categories: ["Intern"] } },
-      context
-    );
+    let enterpriseMatches = await callArchive({ service: "ContactService", method: "GetEnterprises", parameter: { ExternalID: unit.organisasjonsKode, Active: true, Categories: ["Intern"] } });
     if (enterpriseMatches.length === 1) {
       logger.info("Found match for enterprise with ExternalID {OrganisasjonsKode}", unit.organisasjonsKode);
       enterpriseMatch = true;
@@ -91,7 +88,7 @@ const syncEmployee = async (privatePerson, fintfolkEmployee, _manualManagerEmail
     if (!enterpriseMatch && unit.kortnavn) {
       // If not found, trying with shortcode
       logger.info("No unique match for enterprise with ExternalID {OrganisasjonsKode}, trying with shortcode", unit.organisasjonsKode);
-      enterpriseMatches = await callArchive({ service: "ContactService", method: "GetEnterprises", parameter: { Initials: unit.kortnavn, Active: true, Categories: ["Intern"] } }, context);
+      enterpriseMatches = await callArchive({ service: "ContactService", method: "GetEnterprises", parameter: { Initials: unit.kortnavn, Active: true, Categories: ["Intern"] } });
       if (enterpriseMatches.length === 1) {
         logger.info("Found match for enterprise with shortcode {Kortnavn}", unit.kortnavn);
         enterpriseMatch = true;

@@ -1,5 +1,5 @@
 export type SIFResponse = {
-  Successful?: boolean;
+  Successful: boolean;
   ErrorMessage?: string | null;
   ErrorDetails?: string | null;
   TotalCount?: number;

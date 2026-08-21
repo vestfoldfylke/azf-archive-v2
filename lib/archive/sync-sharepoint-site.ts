@@ -19,7 +19,7 @@ export default async (sharePointData, context) => {
   if ((projectNumber && projectNumber.toLowerCase() === "nei") || !projectNumber) {
     // project does not exists. Need to create
     logger.info("syncSharePointSite - createProject");
-    const createProject = await callArchiveTemplate({ system: "sharepoint", template: "create-project", parameter: { siteUrl, projectTitle, responsiblePersonEmail } }, context); // Returns projectNumber from 360
+    const createProject = await callArchiveTemplate({ system: "sharepoint", template: "create-project", parameter: { siteUrl, projectTitle, responsiblePersonEmail } }); // Returns projectNumber from 360
     result.projectNumber = createProject.ProjectNumber;
     result.responsiblePersonEmail = responsiblePersonEmail;
     status.project = "successfully created";
@@ -27,7 +27,7 @@ export default async (sharePointData, context) => {
   } else {
     // contains project number. External ID cannot be updated. Only responisblePerson and Title.
     logger.info("syncSharePointSite - project already exists. Project number: {ProjectNumber}", projectNumber);
-    const getProject = await callArchiveTemplate({ system: "archive", template: "get-project", parameter: { projectNumber } }, context); // Returns projectNumber from 360
+    const getProject = await callArchiveTemplate({ system: "archive", template: "get-project", parameter: { projectNumber } }); // Returns projectNumber from 360
     if (!getProject.ProjectNumber) throw new Error(`Project "${projectNumber}" does not exist.`);
     result.projectNumber = getProject.ProjectNumber;
     result.responsiblePersonEmail = getProject.ResponsiblePerson.Email;
@@ -37,7 +37,7 @@ export default async (sharePointData, context) => {
   result.projectName = projectTitle;
 
   // CASE
-  const getCase = await callArchiveTemplate({ system: "sharepoint", template: "get-case", parameter: { caseExternalId } }, context);
+  const getCase = await callArchiveTemplate({ system: "sharepoint", template: "get-case", parameter: { caseExternalId } });
   if (getCase?.CaseNumber) {
     // If we found a case
     // do not update case if exists
@@ -61,10 +61,11 @@ export default async (sharePointData, context) => {
   } else {
     const template = caseType ? `create-case-${caseType}` : "create-case";
     logger.info("syncSharePointSite - createCase - using template: {TemplateName}", template);
-    const createCase = await callArchiveTemplate(
-      { system: "sharepoint", template, parameter: { caseTitle, projectNumber: result.projectNumber, caseExternalId, accessGroup, paragraph, responsiblePersonEmail: result.responsiblePersonEmail } },
-      context
-    ); // Returns caseNumber from 360
+    const createCase = await callArchiveTemplate({
+      system: "sharepoint",
+      template,
+      parameter: { caseTitle, projectNumber: result.projectNumber, caseExternalId, accessGroup, paragraph, responsiblePersonEmail: result.responsiblePersonEmail }
+    }); // Returns caseNumber from 360
     result.caseNumber = createCase.CaseNumber;
     result.caseTitle = caseTitle;
     status.case = "successfully created";

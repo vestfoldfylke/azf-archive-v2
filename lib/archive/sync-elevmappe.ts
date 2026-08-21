@@ -22,7 +22,7 @@ const syncElevmappe = async (privatePerson, context) => {
   }
 
   // First, check if elevmappe already exists
-  const elevmappe = await callArchiveTemplate({ system: "elevmappe", template: "get-elevmappe", parameter: { ssn } }, context);
+  const elevmappe = await callArchiveTemplate({ system: "elevmappe", template: "get-elevmappe", parameter: { ssn } });
   const elevmappeRes = elevmappe.filter((mappe) => mappe?.Status && mappe.Status !== "Utgår"); // Returns an array of Case-objects where status isn't "Utgår"
 
   if (elevmappeRes.length >= 1 && elevmappeRes[0].CaseNumber) {
@@ -56,7 +56,7 @@ const syncElevmappe = async (privatePerson, context) => {
         "syncElevmappe - Elevmappe '{CaseNumber}' metadata is different from person info (name, ssn, streetAddress), or has wrong case-metadata (title, unofficialTitle)), will update to match person info and case-metadata",
         elevmappeRes[0].CaseNumber
       );
-      return await callArchiveTemplate({ system: "elevmappe", template: "update-elevmappe", parameter: { firstName, lastName, recno, caseNumber: elevmappeRes[0].CaseNumber } }, context);
+      return await callArchiveTemplate({ system: "elevmappe", template: "update-elevmappe", parameter: { firstName, lastName, recno, caseNumber: elevmappeRes[0].CaseNumber } });
     }
     logger.info("syncElevmappe - PrivatePerson was not updated, and elevmappe-metadata on case '{CaseNumber}' was correct, no need to update elevmappe", elevmappeRes[0].CaseNumber);
     return { Recno: elevmappeRes[0].Recno, CaseNumber: elevmappeRes[0].CaseNumber };
@@ -64,7 +64,7 @@ const syncElevmappe = async (privatePerson, context) => {
   if (elevmappeRes.length === 0) {
     // No elevmappe found - create one
     logger.info("syncElevmappe - No elevmappe her gitt, will create");
-    return await callArchiveTemplate({ system: "elevmappe", template: "create-elevmappe", parameter: { firstName, lastName, ssn, recno } }, context);
+    return await callArchiveTemplate({ system: "elevmappe", template: "create-elevmappe", parameter: { firstName, lastName, ssn, recno } });
   }
   // Hit kommer vi egt aldri altså
   logger.error("syncElevmappe - Several elevmapper found on social security number: {Ssn}, send to arkivarer for handling", ssn);

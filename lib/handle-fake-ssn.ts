@@ -42,7 +42,7 @@ const handleFakeSsn = async (birthdate: string, gender: string, name: string, co
   while (!foundUnique) {
     const fakeSsn = newFakeSsn(birthdate, gender, runningNumber);
     logger.info("Check for existing PrivatePersons on fake ssn {FakeSsn}", fakeSsn);
-    const privatePersonRes = (await callArchiveTemplate({ system: "archive", template: "get-private-person", parameter: { ssn: fakeSsn } }, context)) as Array<{ LastName?: string }>;
+    const privatePersonRes = (await callArchiveTemplate({ system: "archive", template: "get-private-person", parameter: { ssn: fakeSsn } })) as Array<{ LastName?: string }>;
     privatePersonResult = privatePersonRes;
     if (privatePersonRes.length === 1 && privatePersonRes[0].LastName === lastName) {
       logger.info("Found existing PrivatePersons on fake ssn {FakeSsn} with same lastName as provided in body, will use it", fakeSsn);
