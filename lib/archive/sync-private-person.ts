@@ -4,7 +4,7 @@ import { MAIL } from "../../config.js";
 import type { Name, SyncElevmappeBody, SyncPrivatePersonMethod, SyncPrivatePersonResponse } from "../../types/elevmappe.js";
 import type { FregRepackedResponse, FregResponse } from "../../types/freg.js";
 import type { KRResult } from "../../types/krr.js";
-import type { SIFRecnoResponse, SIFGetPrivatePersonsResponse, SIFPrivatePersonResult } from "../../types/sif.js";
+import type { SIFGetPrivatePersonsResponse, SIFPrivatePersonResult, SIFRecnoResponse } from "../../types/sif.js";
 import sendmail from "../send-mail.js";
 
 type PrivatePersonDataWithSsn = Omit<SyncPrivatePersonResponse, "name" | "addressProtection" | "recno" | "updated" | "created">;
@@ -197,7 +197,7 @@ const syncPrivatePerson = async (syncPrivatePersonData: SyncElevmappeBody): Prom
     }
 
     logger.info('Identifier is "ssn" checking for PrivatePerson with provided ssn');
-    privatePersonRes = await callArchiveTemplate({ system: "archive", template: "get-private-person", parameter: { ssn } }) as SIFGetPrivatePersonsResponse["PrivatePersons"];
+    privatePersonRes = (await callArchiveTemplate({ system: "archive", template: "get-private-person", parameter: { ssn } })) as SIFGetPrivatePersonsResponse["PrivatePersons"];
     ssnToUse = ssn;
   } else if (syncPrivatePersonMethod === "namebirthdate") {
     // If we use name and birthdate as identifier
@@ -211,7 +211,7 @@ const syncPrivatePerson = async (syncPrivatePersonData: SyncElevmappeBody): Prom
     // Experimental - try to find person in P360 from name first - and then filter out on birthdate, if one match we assume it's good (could potentially give a false positive)
     if (!forceUpdate) {
       logger.info('Identifier is "name and birthdate", forceUpdate is false - we try to get privatePerson directly from P360');
-      const namePrivatePersonRes = await callArchive({ service: "ContactService", method: "GetPrivatePersons", parameter: { Name: name } }) as SIFGetPrivatePersonsResponse["PrivatePersons"];
+      const namePrivatePersonRes = (await callArchive({ service: "ContactService", method: "GetPrivatePersons", parameter: { Name: name } })) as SIFGetPrivatePersonsResponse["PrivatePersons"];
       const repackedBirthdate: RepackedBirthdate = repackBirthdate(birthdate);
       const birthdateMatches: SIFGetPrivatePersonsResponse["PrivatePersons"] = namePrivatePersonRes.filter(
         (privatePerson: SIFPrivatePersonResult) =>
@@ -235,7 +235,11 @@ const syncPrivatePerson = async (syncPrivatePersonData: SyncElevmappeBody): Prom
       fregCache = fregData;
 
       logger.info('Identifier is "name and birthdate" found ssn from freg, will use ssn found in freg as identifier for PrivatePerson');
-      privatePersonRes = await callArchiveTemplate({ system: "archive", template: "get-private-person", parameter: { ssn: fregData.foedselsEllerDNummer } }) as SIFGetPrivatePersonsResponse["PrivatePersons"];
+      privatePersonRes = (await callArchiveTemplate({
+        system: "archive",
+        template: "get-private-person",
+        parameter: { ssn: fregData.foedselsEllerDNummer }
+      })) as SIFGetPrivatePersonsResponse["PrivatePersons"];
       ssnToUse = fregData.foedselsEllerDNummer;
     }
   } else if (syncPrivatePersonMethod === "fakessn") {
@@ -252,7 +256,8 @@ const syncPrivatePerson = async (syncPrivatePersonData: SyncElevmappeBody): Prom
 
     logger.info('Identifier is "fakeSsn" running handleFakeSsn with provided name, birthdate and gender');
     const { resultFakeSsn, privatePersonResult } = await handleFakeSsn(birthdate, gender, name);
-    privatePersonRes = privatePersonResult || await callArchiveTemplate({ system: "archive", template: "get-private-person", parameter: { ssn: fakeSsn } })  as SIFGetPrivatePersonsResponse["PrivatePersons"];
+    privatePersonRes =
+      privatePersonResult || ((await callArchiveTemplate({ system: "archive", template: "get-private-person", parameter: { ssn: fakeSsn } })) as SIFGetPrivatePersonsResponse["PrivatePersons"]);
     ssnToUse = resultFakeSsn;
   } else {
     throw new HTTPError(500, "Hit kommer vi aldri... (men vi gjør sikkert det...)");
@@ -303,7 +308,7 @@ const syncPrivatePerson = async (syncPrivatePersonData: SyncElevmappeBody): Prom
         phoneNumber
       };
 
-      const createPrivatePersonRes = await callArchiveTemplate({ system: "archive", template: "create-private-person", parameter: privatePersonData }) as SIFRecnoResponse["Recno"];
+      const createPrivatePersonRes = (await callArchiveTemplate({ system: "archive", template: "create-private-person", parameter: privatePersonData })) as SIFRecnoResponse["Recno"];
 
       privatePerson.name = name;
       privatePerson.firstName = firstName;
@@ -338,7 +343,7 @@ const syncPrivatePerson = async (syncPrivatePersonData: SyncElevmappeBody): Prom
         phoneNumber: krrData?.phoneNumber
       };
 
-      const createPrivatePersonRes = await callArchiveTemplate({ system: "archive", template: "create-private-person", parameter: privatePersonData }) as SIFRecnoResponse["Recno"];
+      const createPrivatePersonRes = (await callArchiveTemplate({ system: "archive", template: "create-private-person", parameter: privatePersonData })) as SIFRecnoResponse["Recno"];
 
       privatePerson.name = fregData.fulltnavn;
       privatePerson.firstName = fregData.fornavn;
@@ -360,13 +365,11 @@ const syncPrivatePerson = async (syncPrivatePersonData: SyncElevmappeBody): Prom
       // One or more matches - check if there are too many
       // Send e-post til arkivet om at det er flere aktive privatpersoner på samme fnr
       const mailStrBlock: string = `Hallois, hallois!<br><br>Arkiveringsroboten har funnet flere privatpersoner i Public 360 med samme fødselsnummer, og trenger hjelp til å rydde opp i dette, for den vet ikke hvordan :( <br> Dokumenter og saker der privatpersonene er sakspart bør sikkert også sjekkes.<br><br>Fødselsnummeret det gjelder er <strong>${ssnToUse}</strong><br><br>Takker og bukker 😁`;
-      await sendmail(
-        {
-          to: toArchiveAdministrator,
-          subject: "Jeg har funnet flere privatpersoner med samme fødselsnummer",
-          body: mailStrBlock
-        }
-      );
+      await sendmail({
+        to: toArchiveAdministrator,
+        subject: "Jeg har funnet flere privatpersoner med samme fødselsnummer",
+        body: mailStrBlock
+      });
       logger.warn("syncPrivatePerson - Found several privatePerson on the same social security number: {Ssn}, sent mail to arkivarer for handling", ssnToUse);
     }
 
@@ -398,7 +401,7 @@ const syncPrivatePerson = async (syncPrivatePersonData: SyncElevmappeBody): Prom
           logger.info("PrivatePerson with Recno: {Recno} is already up to date, no need to update", foundPrivatePerson.Recno);
           updatePrivatePersonRes = foundPrivatePerson.Recno;
         } else {
-          updatePrivatePersonRes = await callArchiveTemplate({ system: "archive", template: "update-private-person", parameter: privatePersonData }) as SIFRecnoResponse["Recno"]; // Returns recno of updated privatePerson
+          updatePrivatePersonRes = (await callArchiveTemplate({ system: "archive", template: "update-private-person", parameter: privatePersonData })) as SIFRecnoResponse["Recno"]; // Returns recno of updated privatePerson
           updated = true;
         }
 
@@ -442,7 +445,7 @@ const syncPrivatePerson = async (syncPrivatePersonData: SyncElevmappeBody): Prom
           logger.info("PrivatePerson with Recno: {Recno} is already up to date, no need to update", foundPrivatePerson.Recno);
           updatePrivatePersonRes = foundPrivatePerson.Recno;
         } else {
-          updatePrivatePersonRes = await callArchiveTemplate({ system: "archive", template: "update-private-person", parameter: privatePersonData }) as SIFRecnoResponse["Recno"]; // Returns recno of updated privatePerson
+          updatePrivatePersonRes = (await callArchiveTemplate({ system: "archive", template: "update-private-person", parameter: privatePersonData })) as SIFRecnoResponse["Recno"]; // Returns recno of updated privatePerson
           updated = true;
         }
 
@@ -484,13 +487,11 @@ const syncPrivatePerson = async (syncPrivatePersonData: SyncElevmappeBody): Prom
   if (privatePerson.addressProtection) {
     // Send e-post til arkivet om at det er flere aktive privatpersoner på samme fnr
     const mailStrBlock: string = `Hallois, hallois!<br><br>Arkiveringsroboten har håndtert en privatperson i Public 360 med adressebeskyttelse (klientadresse, fortrolig, eller strengtFortrolig), og sier i fra til dere, slik at dere kan sjekke at alt er på stell om dere ønsker.<br><br>Privatpersonen har recno <strong>${privatePerson.recno}</strong><br><br>Ha en strålende dag! 😁`;
-    await sendmail(
-      {
-        to: toArchiveAdministrator,
-        subject: "Håndtert en privatperson med adressebeskyttelse",
-        body: mailStrBlock
-      }
-    );
+    await sendmail({
+      to: toArchiveAdministrator,
+      subject: "Håndtert en privatperson med adressebeskyttelse",
+      body: mailStrBlock
+    });
     logger.warn("syncPrivatePerson - Handled privatePerson with addressProtection, Recno: {Recno}", privatePerson.recno);
   }
 

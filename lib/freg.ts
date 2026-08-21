@@ -1,8 +1,8 @@
 import { FREG } from "../config.js";
+import type { FregResponse } from "../types/freg.js";
 import { getToken } from "./get-entra-id-token.js";
 import HTTPError from "./http-error.js";
 import { requestJson } from "./request-json.js";
-import type { FregResponse } from "../types/freg.js";
 
 const authHeader = async (): Promise<Record<string, string>> => ({ Authorization: `Bearer ${await getToken(FREG.scope)}` });
 

@@ -152,13 +152,11 @@ Kan dere sjekke om dette er korrekt, evt fikse slik at det blir riktig? (Sjekk g
 <br>
 Ha en fortyllende dag 🪄
 `;
-    await sendmail(
-      {
-        to: toArchiveAdministrator,
-        subject: "Arkiveringsroboten klarte ikke finne korrekt leder / virksomhet for ansatt",
-        body: mailBody
-      }
-    );
+    await sendmail({
+      to: toArchiveAdministrator,
+      subject: "Arkiveringsroboten klarte ikke finne korrekt leder / virksomhet for ansatt",
+      body: mailBody
+    });
   }
 
   return { responsibleEnterprise, archiveManager };

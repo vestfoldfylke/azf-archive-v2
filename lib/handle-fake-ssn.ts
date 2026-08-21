@@ -1,9 +1,9 @@
 import { logger } from "@vestfoldfylke/loglady";
 import { COUNTY_NUMBER } from "../config.js";
 import type { FakeSsnResponse } from "../types/archive.js";
+import type { SIFGetPrivatePersonsResponse } from "../types/sif.js";
 import callArchiveTemplate from "./call-archive-template.js";
 import HTTPError from "./http-error.js";
-import type { SIFGetPrivatePersonsResponse } from "../types/sif.js";
 
 const newFakeSsn = (birthdate: string, gender: string, runningNumber: number): string => {
   const dateList: string[] = birthdate.split("-");
@@ -17,7 +17,7 @@ const newFakeSsn = (birthdate: string, gender: string, runningNumber: number): s
   const birthdateFormatted: string = `${day}${month}${year.substring(2, 4)}`;
   const newBirthdate: string = `${Number(birthdateFormatted.substring(0, 1)) + 4}${birthdateFormatted.substring(1, 6)}`;
   const runningStr: string = runningNumber < 10 ? `0${runningNumber}` : `${runningNumber}`;
-  const genderNumber: number = gender.toLowerCase() === "m" ? 1 : 2
+  const genderNumber: number = gender.toLowerCase() === "m" ? 1 : 2;
 
   return `${newBirthdate}${runningStr}${genderNumber}${COUNTY_NUMBER}`;
 };
@@ -52,7 +52,7 @@ const handleFakeSsn = async (birthdate: string, gender: string, name: string): P
     const fakeSsn: string = newFakeSsn(birthdate, gender, runningNumber);
 
     logger.info("Check for existing PrivatePersons on fake ssn {FakeSsn}", fakeSsn);
-    const privatePersonRes = await callArchiveTemplate({ system: "archive", template: "get-private-person", parameter: { ssn: fakeSsn } }) as SIFGetPrivatePersonsResponse["PrivatePersons"];
+    const privatePersonRes = (await callArchiveTemplate({ system: "archive", template: "get-private-person", parameter: { ssn: fakeSsn } })) as SIFGetPrivatePersonsResponse["PrivatePersons"];
     privatePersonResult = privatePersonRes;
 
     if (privatePersonRes.length === 1 && privatePersonRes[0].LastName === lastName) {
@@ -75,7 +75,7 @@ const handleFakeSsn = async (birthdate: string, gender: string, name: string): P
     }
   }
 
-  return { resultFakeSsn, privatePersonResult: (privatePersonResult as SIFGetPrivatePersonsResponse["PrivatePersons"]) };
+  return { resultFakeSsn, privatePersonResult: privatePersonResult as SIFGetPrivatePersonsResponse["PrivatePersons"] };
 };
 
 export { handleFakeSsn, newFakeSsn };

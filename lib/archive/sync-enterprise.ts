@@ -28,13 +28,11 @@ const syncEnterprise = async (enterprise) => {
     if (enterpriseRes.length > 1) {
       const mailStrBlock = `Arkiveringsroboten har funnet duplikate virksomheter i P360. Kan dere hjelpe meg ved å rydde opp virksomheter med orgnr: ${enterprise.EnterpriseNumber}? Tusen takk :)`;
       try {
-        await sendmail(
-          {
-            to: toArchiveAdministrator,
-            subject: "Arkiveringsroboten har funnet duplikate virksomheter i P360",
-            body: mailStrBlock
-          }
-        );
+        await sendmail({
+          to: toArchiveAdministrator,
+          subject: "Arkiveringsroboten har funnet duplikate virksomheter i P360",
+          body: mailStrBlock
+        });
       } catch (error) {
         logger.errorException(error, "syncEnterprise - Sending mail failed when trying to alert about duplicate enterprise with EnterpriseNumber {EnterpriseNumber}", enterprise.EnterpriseNumber);
       }

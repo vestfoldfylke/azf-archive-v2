@@ -44,13 +44,11 @@ export default async (sharePointData) => {
     if (getCase.Status === "Utgår") {
       // Send mail til 360 administrator om at dette er en sharepoint sak som er satt til utgår...
       const mailStrBlock = `Arkiveringsroboten fant en SharePoint-sak som var satt til Utgår i Public 360.<br>Kan dere sette den til riktig status? Roboten vil legge til et dokument i saken, sannsynligvis lenge før du leser denne eposten.... :-)  <br><br>Saken det gjelder har <strong>Saksnummer: ${getCase.CaseNumber}</strong>`;
-      await sendmail(
-        {
-          to: toArchiveAdministrator,
-          subject: "Oppdaget SharePoint-sak med status Utgår",
-          body: mailStrBlock
-        }
-      );
+      await sendmail({
+        to: toArchiveAdministrator,
+        subject: "Oppdaget SharePoint-sak med status Utgår",
+        body: mailStrBlock
+      });
       logger.warn("syncSharePointSite - Found case in P360 but status is Utgår. Will use the case anyway. Case number: {CaseNumber}. Sent mail to archive administrators", getCase.CaseNumber);
     }
     logger.info("syncSharePointSite - Case already exists. Case number: {CaseNumber}", getCase.CaseNumber);

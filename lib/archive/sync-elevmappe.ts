@@ -25,7 +25,7 @@ const syncElevmappe = async (privatePerson: SyncPrivatePersonResponse): Promise<
   }
 
   // First, check if elevmappe already exists
-  const elevmappe = await callArchiveTemplate({ system: "elevmappe", template: "get-elevmappe", parameter: { ssn } }) as SIFCasesResponse["Cases"];
+  const elevmappe = (await callArchiveTemplate({ system: "elevmappe", template: "get-elevmappe", parameter: { ssn } })) as SIFCasesResponse["Cases"];
   const elevmappeRes: SIFCase[] = elevmappe.filter((mappe: SIFCase) => mappe?.Status && mappe.Status !== "Utgår"); // Returns an array of Case-objects where status isn't "Utgår"
 
   if (elevmappeRes.length >= 1 && elevmappeRes[0].CaseNumber) {
@@ -42,20 +42,19 @@ const syncElevmappe = async (privatePerson: SyncPrivatePersonResponse): Promise<
       mailStr += `</ul><br>Roboten ønsker seg <strong>${elevmappeRes[0].CaseNumber}</strong> som gjeldende elevmappe.<br><br>Roboten ordner resten selv når dette er ryddet opp.<br><br>Tusen takk!`;
 
       logger.warn("Found several elevmapper on ssn {Ssn} - CaseNumbers: {@CaseNumbers}", ssn, caseNumbers);
-      await sendmail(
-        {
-          to: toArchive,
-          subject: "Flere elevmapper på en elev",
-          body: mailStr
-        }
-      );
+      await sendmail({
+        to: toArchive,
+        subject: "Flere elevmapper på en elev",
+        body: mailStr
+      });
     }
 
     const needsUpdate: boolean =
       updated ||
       firstElevmappe.Title !== "Elevmappe" ||
       firstElevmappe.UnofficialTitle !== `Elevmappe - ${firstName} ${lastName}` ||
-      ((firstElevmappe.Contacts && firstElevmappe.Contacts.length > 0 && firstElevmappe.Contacts[0].Address.StreetAddress !== streetAddress) || false);
+      (firstElevmappe.Contacts && firstElevmappe.Contacts.length > 0 && firstElevmappe.Contacts[0].Address.StreetAddress !== streetAddress) ||
+      false;
 
     if (needsUpdate) {
       // PrivatePerson was updated or elevmappe was not correct, update elevmappe as well
@@ -64,7 +63,11 @@ const syncElevmappe = async (privatePerson: SyncPrivatePersonResponse): Promise<
         firstElevmappe.CaseNumber
       );
 
-      return await callArchiveTemplate({ system: "elevmappe", template: "update-elevmappe", parameter: { firstName, lastName, recno, caseNumber: elevmappeRes[0].CaseNumber } }) as SIFRecnoAndCaseNumberResponse;
+      return (await callArchiveTemplate({
+        system: "elevmappe",
+        template: "update-elevmappe",
+        parameter: { firstName, lastName, recno, caseNumber: elevmappeRes[0].CaseNumber }
+      })) as SIFRecnoAndCaseNumberResponse;
     }
 
     logger.info("syncElevmappe - PrivatePerson was not updated, and elevmappe-metadata on case '{CaseNumber}' was correct, no need to update elevmappe", elevmappeRes[0].CaseNumber);
@@ -74,7 +77,7 @@ const syncElevmappe = async (privatePerson: SyncPrivatePersonResponse): Promise<
   if (elevmappeRes.length === 0) {
     // No elevmappe found - create one
     logger.info("syncElevmappe - No elevmappe her gitt, will create");
-    return await callArchiveTemplate({ system: "elevmappe", template: "create-elevmappe", parameter: { firstName, lastName, ssn, recno } }) as SIFRecnoAndCaseNumberResponse;
+    return (await callArchiveTemplate({ system: "elevmappe", template: "create-elevmappe", parameter: { firstName, lastName, ssn, recno } })) as SIFRecnoAndCaseNumberResponse;
   }
 
   // Hit kommer vi egt aldri altså

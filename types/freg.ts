@@ -1,9 +1,9 @@
 export type FregAddress = {
-  adressegradering: string
-  gateadresse: string
-  postnummer: string
-  poststed: string
-  landkode: string
+  adressegradering: string;
+  gateadresse: string;
+  postnummer: string;
+  poststed: string;
+  landkode: string;
 };
 
 export type FregRepackedResponse = {
@@ -16,21 +16,21 @@ export type FregRepackedResponse = {
 };
 
 export type FregResponse = {
-  foedselsEllerDNummer: string
-  status: string
-  kanKontaktes: boolean
-  fornavn: string
-  etternavn: string
-  fulltnavn: string
-  foedselsdato: string | undefined
-  alder: number | null
+  foedselsEllerDNummer: string;
+  status: string;
+  kanKontaktes: boolean;
+  fornavn: string;
+  etternavn: string;
+  fulltnavn: string;
+  foedselsdato: string | undefined;
+  alder: number | null;
   doedsfall: {
-    erGjeldende: boolean
-  } | null
-  adressebeskyttelse: string[]
-  bostedsadresse: FregAddress | null
-  deltbostedsadresse: FregAddress | null
-  oppholdsadresse: FregAddress | null
-  postadresse: FregAddress
-  postadresseIUtlandet: FregAddress | null
+    erGjeldende: boolean;
+  } | null;
+  adressebeskyttelse: string[];
+  bostedsadresse: FregAddress | null;
+  deltbostedsadresse: FregAddress | null;
+  oppholdsadresse: FregAddress | null;
+  postadresse: FregAddress;
+  postadresseIUtlandet: FregAddress | null;
 };
