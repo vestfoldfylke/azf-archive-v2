@@ -1,10 +1,11 @@
 import { app, type HttpRequest, type HttpResponseInit, type InvocationContext } from "@azure/functions";
 import { logger } from "@vestfoldfylke/loglady";
 import { syncElevmappe } from "../../lib/archive/sync-elevmappe.js";
-import { getName, getSyncPrivatePersonMethod, syncPrivatePerson } from "../../lib/archive/sync-private-person.js";
+import { getName, getOrThrowSyncPrivatePersonMethod, syncPrivatePerson } from "../../lib/archive/sync-private-person.js";
 import HTTPError from "../../lib/http-error.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
+import type { Name, SyncElevmappeBody, SyncPrivatePersonResponse } from "../../types/elevmappe.js";
 import { updateContext } from "../middleware/async-local-context.js";
 import { logContextHandling } from "../middleware/logcontext-handling.js";
 
@@ -19,9 +20,9 @@ const syncElevmappeHandler = async (request: HttpRequest, context: InvocationCon
   updateContext({ prefix: `SyncElevmappe - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`, contextId: context.invocationId });
   logger.info("Role validated");
 
-  let body: Record<string, unknown>;
+  let body: SyncElevmappeBody;
   try {
-    body = (await request.json()) as Record<string, unknown>;
+    body = (await request.json()) as SyncElevmappeBody;
   } catch {
     const msg = "Please pass a request body";
     logger.error(msg);
@@ -33,12 +34,10 @@ const syncElevmappeHandler = async (request: HttpRequest, context: InvocationCon
     return httpResponse(400, msg);
   }
 
-  const { ssn, name, firstName, lastName, birthdate, fakeSsn, gender, streetAddress, zipCode, zipPlace, email, phoneNumber, forceUpdate, manualData } = body as Record<
-    string,
-    string | boolean | undefined
-  >;
-  const nameObj = getName(name, firstName, lastName);
-  const syncPrivatePersonData = {
+  const { ssn, name, firstName, lastName, birthdate, fakeSsn, gender, streetAddress, zipCode, zipPlace, email, phoneNumber, forceUpdate, manualData } = body as SyncElevmappeBody;
+  const nameObj: Name = getName(name, firstName, lastName);
+
+  const syncPrivatePersonData: SyncElevmappeBody = {
     ssn,
     name: nameObj.fullName,
     firstName: nameObj.firstName,
@@ -55,10 +54,12 @@ const syncElevmappeHandler = async (request: HttpRequest, context: InvocationCon
     manualData
   };
 
-  let privatePerson;
+  let privatePerson: SyncPrivatePersonResponse;
+
   try {
     logger.info("Syncing PrivatePerson");
-    getSyncPrivatePersonMethod(syncPrivatePersonData);
+    getOrThrowSyncPrivatePersonMethod(syncPrivatePersonData);
+
     privatePerson = await syncPrivatePerson(syncPrivatePersonData);
     logger.info("Successfully synced PrivatePerson");
   } catch (error) {

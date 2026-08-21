@@ -1,7 +1,7 @@
 import { app, type HttpRequest, type HttpResponseInit, type InvocationContext } from "@azure/functions";
 import { logger } from "@vestfoldfylke/loglady";
 import { syncEmployee } from "../../lib/archive/sync-employee.js";
-import { getSyncPrivatePersonMethod, syncPrivatePerson } from "../../lib/archive/sync-private-person.js";
+import { getOrThrowSyncPrivatePersonMethod, syncPrivatePerson } from "../../lib/archive/sync-private-person.js";
 import { callFintfolk } from "../../lib/fintfolk.js";
 import HTTPError from "../../lib/http-error.js";
 import { httpResponse } from "../../lib/http-response.js";
@@ -76,7 +76,7 @@ const syncEmployeeHandler = async (request: HttpRequest, context: InvocationCont
   let privatePerson;
   try {
     logger.info("Syncing PrivatePerson");
-    getSyncPrivatePersonMethod(syncPrivatePersonData);
+    getOrThrowSyncPrivatePersonMethod(syncPrivatePersonData);
     privatePerson = await syncPrivatePerson(syncPrivatePersonData);
     logger.info("Successfully synced PrivatePerson");
   } catch (error) {

@@ -10,11 +10,6 @@ export type ArchivePayload = {
 /** The parameter "parameter" is required so it MUST be implemented in the type which uses this as a base type */
 export type ArchivePayloadBaseResponse = Omit<ArchivePayload, "parameter">;
 
-export type ArchiveResponse = {
-  bla: string;
-  // TODO: TBD
-};
-
 export type PdfPayload = {
   system: string;
   template: string;

@@ -5,7 +5,7 @@ import callArchiveTemplate from "../../lib/call-archive-template.js";
 import HTTPError from "../../lib/http-error.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
-import type { CallArchiveInput, CallArchiveTemplateInput } from "../../types/sif.js";
+import type { CallArchiveInput, CallArchiveTemplateInput } from "../../types/archive.js";
 import { updateContext } from "../middleware/async-local-context.js";
 import { logContextHandling } from "../middleware/logcontext-handling.js";
 

@@ -1,6 +1,6 @@
 import { app, type HttpRequest, type HttpResponseInit, type InvocationContext } from "@azure/functions";
 import { logger } from "@vestfoldfylke/loglady";
-import { getName, getSyncPrivatePersonMethod, syncPrivatePerson } from "../../lib/archive/sync-private-person.js";
+import { getName, getOrThrowSyncPrivatePersonMethod, syncPrivatePerson } from "../../lib/archive/sync-private-person.js";
 import HTTPError from "../../lib/http-error.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
@@ -56,7 +56,7 @@ const syncPrivatePersonHandler = async (request: HttpRequest, context: Invocatio
 
   try {
     logger.info("Syncing PrivatePerson");
-    getSyncPrivatePersonMethod(syncPrivatePersonData);
+    getOrThrowSyncPrivatePersonMethod(syncPrivatePersonData);
     const privatePerson = await syncPrivatePerson(syncPrivatePersonData);
     logger.info("Successfully synced PrivatePerson");
 

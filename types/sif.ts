@@ -18,18 +18,38 @@ export type SIFOptions = {
   [key: string]: unknown;
 };
 
-export type CallArchiveInput = {
-  service: string;
-  method: string;
-  parameter: Record<string, unknown>;
-  options?: SIFOptions;
+// callArchiveTemplate and callArchive responses
+
+/** ContactService / GetPrivatePersons */
+export type SIFGetPrivatePersonsResponse = Partial<SIFBaseResponse> & {
+  PrivatePersons: SIFPrivatePersonResult[];
 };
 
-//CallArchiveTemplateBaseInput & {
-export type CallArchiveTemplateInput = {
-  system: string;
-  template: string;
-  parameter: Record<string, unknown>;
-  getExample?: boolean;
-  demoRun?: boolean;
+/** ContactService / SynchronizePrivatePerson */
+export type SIFRecnoResponse = Partial<SIFBaseResponse> & {
+  Recno: string;
+};
+
+// types from SIF documentation used in responses above
+
+export type SIFAddress = {
+  StreetAddress: string;
+  ZipCode: string;
+  ZipPlace: string;
+  Country: string;
+  County: string;
+  Area: string;
+  State?: string;
+};
+
+export type SIFPrivatePersonResult = {
+  Recno: string;
+  FirstName: string;
+  LastName: string;
+  PersonalIdNumber: string;
+  ExternalID: string;
+  Email: string;
+  PhoneNumber: string;
+  MobilePhone: string;
+  PrivateAddress: SIFAddress;
 };
