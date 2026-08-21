@@ -5,20 +5,11 @@ import callArchiveTemplate from "../../lib/call-archive-template.js";
 import HTTPError from "../../lib/http-error.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
-import type { SIFOptions } from "../../types/sif.js";
+import type { CallArchiveInput, CallArchiveTemplateInput } from "../../types/sif.js";
 import { updateContext } from "../middleware/async-local-context.js";
 import { logContextHandling } from "../middleware/logcontext-handling.js";
 
-type ArchiveBody = {
-  service?: string;
-  method?: string;
-  system?: string;
-  template?: string;
-  parameter?: Record<string, unknown>;
-  demoRun?: boolean;
-  getExample?: boolean;
-  options?: SIFOptions;
-};
+type ArchiveBody = CallArchiveInput & CallArchiveTemplateInput;
 
 const archiveHandler = async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
   let logPrefix: string = "Archive";
@@ -95,7 +86,7 @@ const archiveHandler = async (request: HttpRequest, context: InvocationContext):
     } catch (error) {
       if (error instanceof HTTPError) {
         logger.errorException(error, "Template archive call failed - Status: {Status} - {@Data}", error.statusCode, error.data as object);
-        return httpResponse(500, error);
+        return httpResponse(error.statusCode, error);
       }
 
       logger.errorException(error, "Template archive call failed");

@@ -1,6 +1,6 @@
 import { logger } from "@vestfoldfylke/loglady";
 import { ARCHIVE } from "../config.js";
-import type { CallArchiveInput, SIFResponse } from "../types/sif.js";
+import type { CallArchiveInput, SIFRawResponse } from "../types/sif.js";
 import HTTPError from "./http-error.js";
 import { filterSifResult, hasSifError, repackSifResult, repackUglySifError } from "./repack-sif-result.js";
 import { requestJson } from "./request-json.js";
@@ -29,7 +29,7 @@ export default async (archiveData: CallArchiveInput): Promise<unknown> => {
     parameter.SortingCriterion = "RecnoDescending";
   }
 
-  const data = (await requestJson(fetchRequest.url, { method: "POST", body: { parameter }, headers: fetchRequest.headers })) as SIFResponse;
+  const data = (await requestJson(fetchRequest.url, { method: "POST", body: { parameter }, headers: fetchRequest.headers })) as SIFRawResponse;
   logger.info("Got response - service - {Service} - method - {Method}", service, method);
 
   if (archiveData.method.toLowerCase() === "ping") {
@@ -41,13 +41,12 @@ export default async (archiveData: CallArchiveInput): Promise<unknown> => {
     throw new HTTPError(500, repackUglySifError(data).ErrorMessage || "Archive call failed");
   }
 
-  let result: unknown[] = repackSifResult(data) as unknown[];
+  const result: unknown[] = repackSifResult(data) as unknown[];
 
   if (!(isGet && Array.isArray(result))) {
     return result;
   }
 
-  const totalResult: unknown[] = [...result];
   let page: number = 1;
   const totalPages: number = data.TotalPageCount || 1;
 
@@ -65,7 +64,7 @@ export default async (archiveData: CallArchiveInput): Promise<unknown> => {
   while (!finished) {
     logger.info("More boring stuff here, fetching page {PageNumber} of {TotalPageCount}", page + 1, totalPages);
     parameter.Page = page;
-    const pageResult = (await requestJson(fetchRequest.url, { method: "POST", body: { parameter }, headers: fetchRequest.headers })) as SIFResponse;
+    const pageResult = (await requestJson(fetchRequest.url, { method: "POST", body: { parameter }, headers: fetchRequest.headers })) as SIFRawResponse;
     logger.info("Got response - service - {Service} - method - {Method} - page - {PageNumber}", service, method, page + 1);
 
     if (hasSifError(pageResult)) {
@@ -73,7 +72,7 @@ export default async (archiveData: CallArchiveInput): Promise<unknown> => {
     }
 
     const repackedPage: unknown[] = repackSifResult(pageResult) as unknown[];
-    totalResult.push(...repackedPage);
+    result.push(...repackedPage);
     page++;
     finished = page >= totalPages || Boolean(options?.limit && options.limit <= result.length);
 
@@ -90,8 +89,8 @@ export default async (archiveData: CallArchiveInput): Promise<unknown> => {
   }
 
   if (options && typeof options === "object") {
-    return filterSifResult(totalResult, options);
+    return filterSifResult(result, options);
   }
 
-  return totalResult
+  return result;
 };

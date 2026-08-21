@@ -1,5 +1,5 @@
 import { GENERATED_PDF_PROPERTY_NAME } from "../../config.js";
-import type { ArchivePayload, PdfPayload, Template, TemplateData } from "../../types/template.js"; // THIS LINE IS REQUIRED IF YOU NEED PDF GENERATION IN THE TEMPLATE
+import type { ArchivePayload, PdfPayload, Template, TemplateData } from "../../types/template.js";
 
 const template: Template = {
   pdfTemplate: (pdfData: TemplateData): PdfPayload => {

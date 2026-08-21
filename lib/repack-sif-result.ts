@@ -1,4 +1,4 @@
-import type { SIFOptions, SIFResponse } from "../types/sif.js";
+import type { SIFOptions, SIFRawResponse } from "../types/sif.js";
 
 type SIFResult = {
   Status: string;
@@ -6,14 +6,14 @@ type SIFResult = {
 
 const excludeRepackProperties: string[] = ["ErrorDetails", "ErrorMessage", "Successful", "TotalCount", "TotalPageCount", "NextDeltaLastDate"];
 
-const hasSifError = (response: SIFResponse): boolean => {
+const hasSifError = (response: SIFRawResponse): boolean => {
   if (Object.hasOwn(response, "Successful") && !response.Successful) {
     return true;
   }
 
-  return Object.hasOwn(response, "ErrorMessage") && typeof response.ErrorMessage === "string" && response.ErrorMessage.trim().length > 0 && response.ErrorMessage !== "\n"
+  return Object.hasOwn(response, "ErrorMessage") && typeof response.ErrorMessage === "string" && response.ErrorMessage.trim().length > 0 && response.ErrorMessage !== "\n";
 };
-const repackUglySifError = (response: SIFResponse): SIFResponse => {
+const repackUglySifError = (response: SIFRawResponse): SIFRawResponse => {
   response.ErrorMessage =
     response.ErrorMessage && typeof response.ErrorMessage === "string" && response.ErrorMessage.includes("Exception:")
       ? response.ErrorMessage.split("Exception:")[1].split("<operation>")[0]
@@ -26,7 +26,7 @@ const repackUglySifError = (response: SIFResponse): SIFResponse => {
   return response;
 };
 
-const repackSifResult = (sifResult: SIFResponse): unknown => {
+const repackSifResult = (sifResult: SIFRawResponse): unknown => {
   const keysToInclude: string[] = Object.keys(sifResult).filter((key: string) => !excludeRepackProperties.includes(key));
   if (keysToInclude.length === 0) {
     return null; // No data
