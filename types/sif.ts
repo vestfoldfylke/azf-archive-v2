@@ -20,14 +20,24 @@ export type SIFOptions = {
 
 // callArchiveTemplate and callArchive responses
 
+/** CaseService / GetCases */
+export type SIFCasesResponse = Partial<SIFBaseResponse> & {
+  Cases: SIFCase[];
+};
+
 /** ContactService / GetPrivatePersons */
 export type SIFGetPrivatePersonsResponse = Partial<SIFBaseResponse> & {
   PrivatePersons: SIFPrivatePersonResult[];
 };
 
-/** ContactService / SynchronizePrivatePerson */
+/** General response which only returns a Recno */
 export type SIFRecnoResponse = Partial<SIFBaseResponse> & {
   Recno: string;
+};
+
+/** General response which returns a Recno and a CaseNumber */
+export type SIFRecnoAndCaseNumberResponse = SIFRecnoResponse & {
+  CaseNumber: string;
 };
 
 // types from SIF documentation used in responses above
@@ -40,6 +50,28 @@ export type SIFAddress = {
   County: string;
   Area: string;
   State?: string;
+};
+
+export type SIFCase = {
+  CaseNumber: string;
+  Recno: string;
+  Status?: string;
+  Title: string;
+  UnofficialTitle: string;
+  Contacts?: SIFCaseContact[];
+};
+
+export type SIFCaseContact = {
+  Address: SIFAddress;
+  ContactName: string;
+  ContactType: string;
+  ExternalId: string;
+  IsUnofficial: boolean;
+  Notes?: string;
+  Recno: string;
+  ReferenceNumber: string;
+  Role: string;
+  SubjectArea?: string;
 };
 
 export type SIFPrivatePersonResult = {

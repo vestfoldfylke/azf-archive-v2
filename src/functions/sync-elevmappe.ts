@@ -6,6 +6,7 @@ import HTTPError from "../../lib/http-error.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
 import type { Name, SyncElevmappeBody, SyncPrivatePersonResponse } from "../../types/elevmappe.js";
+import type { SIFRecnoAndCaseNumberResponse } from "../../types/sif.js";
 import { updateContext } from "../middleware/async-local-context.js";
 import { logContextHandling } from "../middleware/logcontext-handling.js";
 
@@ -74,7 +75,8 @@ const syncElevmappeHandler = async (request: HttpRequest, context: InvocationCon
 
   try {
     logger.info("Syncing elevmappe");
-    const elevmappe = await syncElevmappe(privatePerson);
+
+    const elevmappe: SIFRecnoAndCaseNumberResponse = await syncElevmappe(privatePerson);
     logger.info("Successfully synced elevmappe");
     return httpResponse(200, { privatePerson, elevmappe });
   } catch (error) {
