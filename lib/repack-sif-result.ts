@@ -13,6 +13,7 @@ const hasSifError = (response: SIFRawResponse): boolean => {
 
   return Object.hasOwn(response, "ErrorMessage") && typeof response.ErrorMessage === "string" && response.ErrorMessage.trim().length > 0 && response.ErrorMessage !== "\n";
 };
+
 const repackUglySifError = (response: SIFRawResponse): SIFRawResponse => {
   response.ErrorMessage =
     response.ErrorMessage && typeof response.ErrorMessage === "string" && response.ErrorMessage.includes("Exception:")

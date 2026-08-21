@@ -1,7 +1,7 @@
 export type SIFBaseResponse = {
   ErrorDetails?: string | null;
   ErrorMessage?: string | null;
-  Successful: boolean;
+  Successful?: boolean;
   TotalCount?: number;
   TotalPageCount?: number;
   NextDeltaLastDate?: string;
@@ -32,7 +32,7 @@ export type SIFGetPrivatePersonsResponse = Partial<SIFBaseResponse> & {
 
 /** General response which only returns a Recno */
 export type SIFRecnoResponse = Partial<SIFBaseResponse> & {
-  Recno: string;
+  Recno: number;
 };
 
 /** General response which returns a Recno and a CaseNumber */
@@ -53,12 +53,42 @@ export type SIFAddress = {
 };
 
 export type SIFCase = {
+  AccessCodeDescription: string;
+  AccessCodeCode: string;
+  AccessGroup: string;
+  ArchiveCodes: string[];
+  CaseEstates: null;
   CaseNumber: string;
-  Recno: string;
+  CaseRowPermissions: null;
+  CaseTypeCode: string;
+  CaseTypeDescription: string;
+  Contacts?: SIFCaseContact[] | null;
+  CreatedDate: string;
+  CustomFields: null;
+  Date: string;
+  Documents: unknown[];
+  ExternalId: string | null;
+  LastChangedDate: string;
+  Notes: string;
+  Paragraph: string;
+  ProjectRecno: string;
+  ProjectName: string;
+  ProgressPlan: Record<string, unknown>;
+  Recno: number; // TODO: Is Recno a number????
+  ReferringCases: null;
+  ReferringDocuments: null;
+  ResponsibleEnterprise: Record<string, unknown>;
+  ResponsibleEnterpriseName: string;
+  ResponsiblePerson: Record<string, unknown>;
+  ResponsiblePersonName: string;
+  SubArchive: string;
+  SubArchiveCode: string;
+  SubjectSpecificMetaData: null;
+  SubjectSpecificMetaDataNamespace: null;
   Status?: string;
   Title: string;
   UnofficialTitle: string;
-  Contacts?: SIFCaseContact[];
+  URL: string;
 };
 
 export type SIFCaseContact = {
@@ -68,14 +98,14 @@ export type SIFCaseContact = {
   ExternalId: string;
   IsUnofficial: boolean;
   Notes?: string;
-  Recno: string;
+  Recno: number;
   ReferenceNumber: string;
   Role: string;
   SubjectArea?: string;
 };
 
 export type SIFPrivatePersonResult = {
-  Recno: string;
+  Recno: number;
   FirstName: string;
   LastName: string;
   PersonalIdNumber: string;
