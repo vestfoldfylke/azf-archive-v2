@@ -1,6 +1,6 @@
 import { logger } from "@vestfoldfylke/loglady";
 import { GENERATED_PDF_PROPERTY_NAME } from "../config.js";
-import type { CallArchiveTemplateInput } from "../types/sif.js";
+import type { CallArchiveTemplateInput } from "../types/archive.js";
 import type { ArchivePayload, PdfPayload, Template, ValidatedTemplateResponse } from "../types/template.js";
 import callArchive from "./call-archive.js";
 import generatePdf from "./generate-pdf.js";

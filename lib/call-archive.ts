@@ -1,6 +1,7 @@
 import { logger } from "@vestfoldfylke/loglady";
 import { ARCHIVE } from "../config.js";
-import type { CallArchiveInput, SIFRawResponse } from "../types/sif.js";
+import type { CallArchiveInput } from "../types/archive.js";
+import type { SIFRawResponse } from "../types/sif.js";
 import HTTPError from "./http-error.js";
 import { filterSifResult, hasSifError, repackSifResult, repackUglySifError } from "./repack-sif-result.js";
 import { requestJson } from "./request-json.js";
