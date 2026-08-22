@@ -1,10 +1,11 @@
+import type { BrregAdresse, BrregEnhet, BrregEnhetRepacked } from "../types/brreg.js";
 import HTTPError from "./http-error.js";
 
-const repackAddress = (addressList) => {
-  return addressList.filter((address) => address).join(", ");
+const repackAddress = (addressList: string[]): string => {
+  return addressList.filter((address: string) => address).join(", ");
 };
 
-const repackBrreg = (enterprise) => {
+const repackBrreg = (enterprise: BrregEnhet): BrregEnhetRepacked => {
   if (enterprise.respons_klasse === "SlettetEnhet") {
     throw new HTTPError(400, `Enterprise with orgnr ${enterprise.organisasjonsnummer} is deleted in Brreg`, {
       respons_klasse: enterprise.respons_klasse,
@@ -13,7 +14,7 @@ const repackBrreg = (enterprise) => {
     });
   }
 
-  const address = enterprise.forretningsadresse || enterprise.beliggenhetsadresse || enterprise.postadresse;
+  const address: BrregAdresse | undefined = enterprise.forretningsadresse || enterprise.beliggenhetsadresse || enterprise.postadresse;
   if (!address) {
     throw new HTTPError(400, `Enterprise with orgnr ${enterprise.organisasjonsnummer} has no registered address`, {
       respons_klasse: enterprise.respons_klasse,

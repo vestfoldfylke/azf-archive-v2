@@ -24,9 +24,9 @@ const syncElevmappeHandler = async (request: HttpRequest, context: InvocationCon
   let body: SyncElevmappeBody;
   try {
     body = (await request.json()) as SyncElevmappeBody;
-  } catch {
+  } catch (error) {
     const msg = "Please pass a request body";
-    logger.error(msg);
+    logger.errorException(error, msg);
     return httpResponse(400, msg);
   }
   if (!body) {

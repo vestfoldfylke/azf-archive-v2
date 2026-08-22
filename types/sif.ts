@@ -21,17 +21,22 @@ export type SIFOptions = {
 // callArchiveTemplate and callArchive responses
 
 /** CaseService / GetCases */
-export type SIFCasesResponse = Partial<SIFBaseResponse> & {
+export type SIFCasesResponse = SIFBaseResponse & {
   Cases: SIFCase[];
 };
 
+/** ContactService / GetEnterprises */
+export type SIFGetEnterprisesResponse = SIFBaseResponse & {
+  Enterprises: SIFEnterpriseResult[];
+};
+
 /** ContactService / GetPrivatePersons */
-export type SIFGetPrivatePersonsResponse = Partial<SIFBaseResponse> & {
+export type SIFGetPrivatePersonsResponse = SIFBaseResponse & {
   PrivatePersons: SIFPrivatePersonResult[];
 };
 
 /** General response which only returns a Recno */
-export type SIFRecnoResponse = Partial<SIFBaseResponse> & {
+export type SIFRecnoResponse = SIFBaseResponse & {
   Recno: number;
 };
 
@@ -74,7 +79,7 @@ export type SIFCase = {
   ProjectRecno: string;
   ProjectName: string;
   ProgressPlan: Record<string, unknown>;
-  Recno: number; // TODO: Is Recno a number????
+  Recno: number;
   ReferringCases: null;
   ReferringDocuments: null;
   ResponsibleEnterprise: Record<string, unknown>;
@@ -104,9 +109,24 @@ export type SIFCaseContact = {
   SubjectArea?: string;
 };
 
+export type SIFEnterpriseResult = {
+  Recno: number;
+  EnterpriseNumber: number;
+  ExternalID: string;
+  Name: string;
+  PhoneNumber: string;
+  MobilePhone: string;
+  Email: string;
+  Initials: string;
+  Categories?: string[];
+  PostAddress?: SIFAddress;
+  OfficeAddress?: SIFAddress;
+};
+
 export type SIFPrivatePersonResult = {
   Recno: number;
   FirstName: string;
+  MiddleName: string;
   LastName: string;
   PersonalIdNumber: string;
   ExternalID: string;
