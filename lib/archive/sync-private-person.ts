@@ -1,20 +1,15 @@
-// @ts-nocheck TODO: proper types (result objects use dynamic property assignment)
 import { logger } from "@vestfoldfylke/loglady";
 import { MAIL } from "../../config.js";
-import type { Name, SyncElevmappeBody, SyncPrivatePersonMethod, SyncPrivatePersonResponse } from "../../types/elevmappe.js";
+import type { Name, SyncElevmappeBody, SyncPrivatePersonMethod } from "../../types/elevmappe.js";
 import type { FregRepackedResponse, FregResponse } from "../../types/freg.js";
 import type { KRResult } from "../../types/krr.js";
+import type { RepackedBirthdate, SyncPrivatePersonResponse } from "../../types/private-person.js";
 import type { SIFGetPrivatePersonsResponse, SIFPrivatePersonResult, SIFRecnoResponse } from "../../types/sif.js";
 import sendmail from "../send-mail.js";
 
 type PrivatePersonDataWithSsn = Omit<SyncPrivatePersonResponse, "name" | "addressProtection" | "recno" | "updated" | "created">;
 
 type PrivatePersonDataWithRecno = Omit<SyncPrivatePersonResponse, "name" | "addressProtection" | "ssn" | "updated" | "created">;
-
-type RepackedBirthdate = {
-  regular: string;
-  fakeSsn: string;
-};
 
 const { toArchiveAdministrator } = MAIL;
 
@@ -55,7 +50,7 @@ const privatePersonIsUpToDate = (privatePersonToUpdate: SIFPrivatePersonResult, 
   return true;
 };
 
-const getFirstAndLastName = (name: string): Name => {
+const getFirstAndLastName = (name: string): Partial<Name> => {
   const nameList: string[] = name.split(" ");
   if (nameList.length < 2) {
     throw new HTTPError(400, "Name must have at least one whitespace in it...");
@@ -75,7 +70,7 @@ const getNameFromFirstAndLastName = (firstName: string, lastName: string): strin
   return `${firstName} ${lastName}`;
 };
 
-const getName = (name: string | undefined, firstName: string | undefined, lastName: string | undefined): Name => {
+const getName = (name: string | undefined, firstName: string | undefined, lastName: string | undefined): Partial<Name> => {
   if (name) {
     const { firstName, lastName } = getFirstAndLastName(name);
     return { firstName, lastName, fullName: name };
@@ -295,27 +290,27 @@ const syncPrivatePerson = async (syncPrivatePersonData: SyncElevmappeBody): Prom
 
     if (manualData || fakeSsn) {
       // CREATE with manual data
-      const { firstName, lastName } = getFirstAndLastName(name);
+      const { firstName, lastName } = getFirstAndLastName(name as string);
 
       const privatePersonData: PrivatePersonDataWithSsn = {
-        firstName,
-        lastName,
+        firstName: firstName as string | null,
+        lastName: lastName as string | null,
         ssn: ssnToUse,
-        streetAddress,
-        zipCode,
-        zipPlace,
-        email,
-        phoneNumber
+        streetAddress: streetAddress as string | null,
+        zipCode: zipCode as string | null,
+        zipPlace: zipPlace as string | null,
+        email: email as string | null,
+        phoneNumber: phoneNumber as string | null
       };
 
       const createPrivatePersonRes = (await callArchiveTemplate({ system: "archive", template: "create-private-person", parameter: privatePersonData })) as SIFRecnoResponse["Recno"];
 
-      privatePerson.name = name;
-      privatePerson.firstName = firstName;
-      privatePerson.lastName = lastName;
-      privatePerson.streetAddress = streetAddress;
-      privatePerson.zipCode = privatePersonData.zipCode;
-      privatePerson.zipPlace = privatePersonData.zipPlace;
+      privatePerson.name = name as string | null;
+      privatePerson.firstName = firstName as string | null;
+      privatePerson.lastName = lastName as string | null;
+      privatePerson.streetAddress = streetAddress as string | null;
+      privatePerson.zipCode = privatePersonData.zipCode as string | null;
+      privatePerson.zipPlace = privatePersonData.zipPlace as string | null;
       privatePerson.addressProtection = false;
       privatePerson.email = email || null;
       privatePerson.phoneNumber = phoneNumber || null;
@@ -339,8 +334,8 @@ const syncPrivatePerson = async (syncPrivatePersonData: SyncElevmappeBody): Prom
         streetAddress: address.streetAddress,
         zipCode: address.zipCode,
         zipPlace: address.zipPlace,
-        email: krrData?.email,
-        phoneNumber: krrData?.phoneNumber
+        email: krrData?.email as string | null,
+        phoneNumber: krrData?.phoneNumber as string | null
       };
 
       const createPrivatePersonRes = (await callArchiveTemplate({ system: "archive", template: "create-private-person", parameter: privatePersonData })) as SIFRecnoResponse["Recno"];
@@ -381,17 +376,17 @@ const syncPrivatePerson = async (syncPrivatePersonData: SyncElevmappeBody): Prom
 
       if (manualData || fakeSsn) {
         // UPDATE privateperson with manual data
-        const { firstName, lastName } = getFirstAndLastName(name);
+        const { firstName, lastName } = getFirstAndLastName(name as string);
 
         const privatePersonData: PrivatePersonDataWithRecno = {
           recno: foundPrivatePerson.Recno,
-          firstName,
-          lastName,
-          streetAddress,
-          zipCode,
-          zipPlace,
-          email,
-          phoneNumber
+          firstName: firstName as string | null,
+          lastName: lastName as string | null,
+          streetAddress: streetAddress as string | null,
+          zipCode: zipCode as string | null,
+          zipPlace: zipPlace as string | null,
+          email: email as string | null,
+          phoneNumber: phoneNumber as string | null
         };
 
         let updatePrivatePersonRes: SIFRecnoResponse["Recno"] | null = null;
@@ -405,10 +400,10 @@ const syncPrivatePerson = async (syncPrivatePersonData: SyncElevmappeBody): Prom
           updated = true;
         }
 
-        privatePerson.name = name;
-        privatePerson.firstName = firstName;
-        privatePerson.lastName = lastName;
-        privatePerson.streetAddress = streetAddress;
+        privatePerson.name = name as string | null;
+        privatePerson.firstName = firstName as string | null;
+        privatePerson.lastName = lastName as string | null;
+        privatePerson.streetAddress = streetAddress as string | null;
         privatePerson.zipCode = privatePersonData.zipCode;
         privatePerson.zipPlace = privatePersonData.zipPlace;
         privatePerson.addressProtection = false;
@@ -434,8 +429,8 @@ const syncPrivatePerson = async (syncPrivatePersonData: SyncElevmappeBody): Prom
           streetAddress: address.streetAddress,
           zipCode: address.zipCode,
           zipPlace: address.zipPlace,
-          email: krrData?.email,
-          phoneNumber: krrData?.phoneNumber
+          email: krrData?.email as string | null,
+          phoneNumber: krrData?.phoneNumber as string | null
         };
 
         let updatePrivatePersonRes: SIFRecnoResponse["Recno"] | null = null;

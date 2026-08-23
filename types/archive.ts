@@ -16,6 +16,6 @@ export type CallArchiveTemplateInput = {
 };
 
 export type FakeSsnResponse = {
-  resultFakeSsn: string | undefined;
+  resultFakeSsn: string | null;
   privatePersonResult: SIFGetPrivatePersonsResponse["PrivatePersons"];
 };

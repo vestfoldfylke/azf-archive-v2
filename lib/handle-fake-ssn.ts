@@ -44,7 +44,7 @@ const handleFakeSsn = async (birthdate: string, gender: string, name: string): P
 
   let foundUnique: boolean = false;
   let runningNumber: number = 99;
-  let resultFakeSsn: string | undefined;
+  let resultFakeSsn: string | null = null;
   let privatePersonResult: SIFGetPrivatePersonsResponse["PrivatePersons"] | null = null;
   const lastName: string = getLastName(name);
 

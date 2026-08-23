@@ -1,6 +1,6 @@
 import { logger } from "@vestfoldfylke/loglady";
 import { MAIL } from "../../config.js";
-import type { SyncPrivatePersonResponse } from "../../types/elevmappe.js";
+import type { SyncPrivatePersonResponse } from "../../types/private-person.js";
 import type { SIFCase, SIFCasesResponse, SIFRecnoAndCaseNumberResponse } from "../../types/sif.js";
 import callArchiveTemplate from "../call-archive-template.js";
 import HTTPError from "../http-error.js";

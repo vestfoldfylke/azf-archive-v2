@@ -32,7 +32,7 @@ type DocumentAttachment = {
 type DocumentContact = {
   ssn: string;
   externalId: string;
-  recno: string;
+  recno: number;
   role: string;
   isUnofficial?: boolean;
   privatePersonRecno?: string;

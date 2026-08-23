@@ -5,7 +5,8 @@ import { getName, getOrThrowSyncPrivatePersonMethod, syncPrivatePerson } from ".
 import HTTPError from "../../lib/http-error.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
-import type { Name, SyncElevmappeBody, SyncPrivatePersonResponse } from "../../types/elevmappe.js";
+import type { Name, SyncElevmappeBody } from "../../types/elevmappe.js";
+import type { SyncPrivatePersonResponse } from "../../types/private-person.js";
 import type { SIFRecnoAndCaseNumberResponse } from "../../types/sif.js";
 import { updateContext } from "../middleware/async-local-context.js";
 import { logContextHandling } from "../middleware/logcontext-handling.js";
@@ -36,7 +37,7 @@ const syncElevmappeHandler = async (request: HttpRequest, context: InvocationCon
   }
 
   const { ssn, name, firstName, lastName, birthdate, fakeSsn, gender, streetAddress, zipCode, zipPlace, email, phoneNumber, forceUpdate, manualData } = body as SyncElevmappeBody;
-  const nameObj: Name = getName(name, firstName, lastName);
+  const nameObj: Partial<Name> = getName(name, firstName, lastName);
 
   const syncPrivatePersonData: SyncElevmappeBody = {
     ssn,
