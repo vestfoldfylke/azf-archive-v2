@@ -7,10 +7,16 @@ type RequestOptions = {
 };
 
 const parseBody = async (response: Response): Promise<unknown> => {
-  const raw = await response.text();
-  if (!raw) return null;
-  const contentType = response.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) return raw;
+  const raw: string | null = await response.text();
+  if (!raw) {
+    return null;
+  }
+
+  const contentType: string = response.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    return raw;
+  }
+
   try {
     return JSON.parse(raw);
   } catch {
@@ -24,6 +30,7 @@ const requestJson = async (url: string, options: RequestOptions = {}): Promise<u
     method,
     headers: { Accept: "application/json", ...headers }
   };
+
   if (body !== undefined) {
     init.body = typeof body === "string" ? body : JSON.stringify(body);
     if (!init.headers["Content-Type"] && !init.headers["content-type"]) {
@@ -31,12 +38,14 @@ const requestJson = async (url: string, options: RequestOptions = {}): Promise<u
     }
   }
 
-  const response = await fetch(url, init);
-  const parsed = await parseBody(response);
+  const response: Response = await fetch(url, init);
+  const parsed: unknown = await parseBody(response);
+
   if (!response.ok) {
-    const message = typeof parsed === "string" ? parsed || response.statusText : response.statusText;
+    const message: string = typeof parsed === "string" ? parsed || response.statusText : response.statusText;
     throw new HTTPError(response.status, message, parsed);
   }
+
   return parsed;
 };
 

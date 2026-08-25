@@ -17,11 +17,12 @@ const womanAfter2000 = {
 
 describe("New fake ssn is generated as expected", () => {
   test("When subject is man born before 2000, running number is two digits", () => {
-    const fakeSsn = newFakeSsn(manBefore2000.birthdate, manBefore2000.gender, manBefore2000.runningNumber);
+    const fakeSsn: string = newFakeSsn(manBefore2000.birthdate, manBefore2000.gender, manBefore2000.runningNumber);
     assert.equal(fakeSsn, `690193991${COUNTY_NUMBER}`);
   });
+
   test("When subject is woman born after 2000, running number is one digit", () => {
-    const fakeSsn = newFakeSsn(womanAfter2000.birthdate, womanAfter2000.gender, womanAfter2000.runningNumber);
+    const fakeSsn: string = newFakeSsn(womanAfter2000.birthdate, womanAfter2000.gender, womanAfter2000.runningNumber);
     assert.equal(fakeSsn, `421002042${COUNTY_NUMBER}`);
   });
 });

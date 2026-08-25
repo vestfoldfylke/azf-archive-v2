@@ -3,13 +3,32 @@ import { MAIL } from "../config.js";
 import HTTPError from "./http-error.js";
 import { requestJson } from "./request-json.js";
 
-type MailOptions = { to: string | string[]; subject: string; body: string };
+type MailBody = {
+  to: MailOptions["to"];
+  cc?: string[];
+  bcc?: string[];
+  from: string;
+  subject: string;
+  template: {
+    templateName: string;
+    templateData: {
+      body: MailOptions["body"];
+      signature: typeof MAIL.signature;
+    };
+  };
+};
+
+type MailOptions = {
+  to: string | string[];
+  subject: string;
+  body: string;
+};
 
 const { bcc, cc, from, signature, url, secret, templateName } = MAIL;
 
-export default async (options: MailOptions): Promise<unknown> => {
+export default async (options: MailOptions): Promise<void> => {
   const { to, subject, body } = options;
-  const payload: Record<string, unknown> = {
+  const payload: MailBody = {
     to,
     from,
     subject,
@@ -21,23 +40,30 @@ export default async (options: MailOptions): Promise<unknown> => {
       }
     }
   };
-  if (cc) payload.cc = cc;
-  if (bcc) payload.bcc = bcc;
+
+  if (cc.length > 0) {
+    payload.cc = cc;
+  }
+  if (bcc.length > 0) {
+    payload.bcc = bcc;
+  }
+
   try {
-    const data = await requestJson(url as string, {
+    await requestJson(url, {
       method: "POST",
       body: payload,
-      headers: { "x-functions-key": secret as string }
+      headers: {
+        "x-functions-key": secret
+      }
     });
+
     logger.info("send-mail - mail sent - to - {@To} - cc - {@Cc} - bcc - {@Bcc}", to, cc, bcc);
-    return data;
   } catch (error) {
     if (error instanceof HTTPError) {
       logger.errorException(error, "send-mail - failed to send mail - to - {@To} - cc - {@Cc} - bcc - {@Bcc} - Data: {@Data}", to, cc, bcc, error.data as object);
-      return null;
+      return;
     }
 
     logger.errorException(error, "send-mail - failed to send mail - to - {@To} - cc - {@Cc} - bcc - {@Bcc}", to, cc, bcc);
-    return null;
   }
 };

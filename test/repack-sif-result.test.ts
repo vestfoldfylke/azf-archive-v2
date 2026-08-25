@@ -239,7 +239,7 @@ test("PrivatePerson result has one item only", () => {
 
 test('PrivatePerson results one item has a "Recno" property', () => {
   assert.equal("hasError" in resultPrivatePerson, false);
-  assert.equal(resultPrivatePerson[0].Recno, 123456);
+  assert.equal((resultPrivatePerson as SIFPrivatePersonResult[])[0].Recno, 123456);
 });
 
 test("PrivatePerson with empty response is array", () => {
@@ -277,10 +277,10 @@ test("GetCase result with limit set to 2 is returned as Array with 2 items", () 
   assert.equal("hasError" in result, false);
   assert.equal(Array.isArray(result), true);
   assert.equal(result.length, 2);
-  assert.equal(result[0].Recno, 123456);
-  assert.equal(result[0].CaseNumber, "40/12345");
-  assert.equal(result[1].Recno, 123457);
-  assert.equal(result[1].CaseNumber, "40/12346");
+  assert.equal((result as SIFCase[])[0].Recno, 123456);
+  assert.equal((result as SIFCase[])[0].CaseNumber, "40/12345");
+  assert.equal((result as SIFCase[])[1].Recno, 123457);
+  assert.equal((result as SIFCase[])[1].CaseNumber, "40/12346");
 });
 
 test("GetCase result with limit set to 5 is returned as Array with 3 items", () => {
@@ -288,12 +288,12 @@ test("GetCase result with limit set to 5 is returned as Array with 3 items", () 
   assert.equal("hasError" in result, false);
   assert.equal(Array.isArray(result), true);
   assert.equal(result.length, 3);
-  assert.equal(result[0].Recno, 123456);
-  assert.equal(result[0].CaseNumber, "40/12345");
-  assert.equal(result[1].Recno, 123457);
-  assert.equal(result[1].CaseNumber, "40/12346");
-  assert.equal(result[2].Recno, 123458);
-  assert.equal(result[2].CaseNumber, "40/12347");
+  assert.equal((result as SIFCase[])[0].Recno, 123456);
+  assert.equal((result as SIFCase[])[0].CaseNumber, "40/12345");
+  assert.equal((result as SIFCase[])[1].Recno, 123457);
+  assert.equal((result as SIFCase[])[1].CaseNumber, "40/12346");
+  assert.equal((result as SIFCase[])[2].Recno, 123458);
+  assert.equal((result as SIFCase[])[2].CaseNumber, "40/12347");
 });
 
 test("GetCase result with limit not set is returned as Array with 3 items", () => {
@@ -301,12 +301,12 @@ test("GetCase result with limit not set is returned as Array with 3 items", () =
   assert.equal("hasError" in result, false);
   assert.equal(Array.isArray(result), true);
   assert.equal(result.length, 3);
-  assert.equal(result[0].Recno, 123456);
-  assert.equal(result[0].CaseNumber, "40/12345");
-  assert.equal(result[1].Recno, 123457);
-  assert.equal(result[1].CaseNumber, "40/12346");
-  assert.equal(result[2].Recno, 123458);
-  assert.equal(result[2].CaseNumber, "40/12347");
+  assert.equal((result as SIFCase[])[0].Recno, 123456);
+  assert.equal((result as SIFCase[])[0].CaseNumber, "40/12345");
+  assert.equal((result as SIFCase[])[1].Recno, 123457);
+  assert.equal((result as SIFCase[])[1].CaseNumber, "40/12346");
+  assert.equal((result as SIFCase[])[2].Recno, 123458);
+  assert.equal((result as SIFCase[])[2].CaseNumber, "40/12347");
 });
 
 test("CreateCase result with ErrorMessage is Object", () => {

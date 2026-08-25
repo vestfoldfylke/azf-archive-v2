@@ -20,8 +20,8 @@ const config = {
     key: process.env.PDF_GENERATOR_KEY
   },
   MAIL: {
-    cc: process.env.MAIL_CC?.split(",") || false,
-    bcc: process.env.MAIL_BCC?.split(",") || false,
+    cc: process.env.MAIL_CC?.split(",") || [],
+    bcc: process.env.MAIL_BCC?.split(",") || [],
     from: process.env.MAIL_FROM || "noreply@vestfoldfylke.no",
     templateName: process.env.MAIL_TEMPLATE_NAME || "vestfoldfylke",
     signature: {
@@ -31,11 +31,11 @@ const config = {
       phone: process.env.MAIL_PHONE || "35 91 70 00",
       mobile: process.env.MAIL_MOBILE || "35 91 70 00"
     },
-    secret: process.env.MAIL_SECRET || false,
+    secret: process.env.MAIL_SECRET || "",
     toArchive: process.env.MAIL_TO_ARCHIVE?.split(",") || [],
     toArchiveAdministrator: process.env.MAIL_TO_ARCHIVE_ADMINISTRATOR?.split(",") || [],
     toArchive7011: process.env.MAIL_TO_ARCHIVE_7011?.split(",") || [],
-    url: process.env.MAIL_URL
+    url: process.env.MAIL_URL || ""
   },
   APPREG_CLIENT: {
     clientId: process.env.APPREG_CLIENT_ID ?? "superId",

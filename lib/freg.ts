@@ -26,10 +26,10 @@ const fregNameBirthdate = async (name: string, birthdate: string): Promise<FregR
     throw new HTTPError(400, "birthdate must be on the format YYYY-MM-DD");
   }
 
-  const fregbirthdate: string = birthdate.replaceAll("-", "");
+  const fregBirthdate: string = birthdate.replaceAll("-", "");
   const data = (await requestJson(FREG.url, {
     method: "POST",
-    body: { name, birthdate: fregbirthdate },
+    body: { name, birthdate: fregBirthdate },
     headers: await authHeader()
   })) as FregResponse;
 
