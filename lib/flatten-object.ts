@@ -19,7 +19,14 @@ const flattenObject = (obj: Record<string, unknown>, options: FlattenOptions = {
       Object.assign(
         flattened,
         flattenObject(
-          value.reduce((a, v, i) => ({ ...a, [`${options.prefix}${key}[${i}]`]: v }), {} as Record<string, unknown>),
+          value.reduce(
+            (a, v, i) => {
+              a[`${options.prefix}${key}[${i}]`] = v;
+
+              return a;
+            },
+            {} as Record<string, unknown>
+          ),
           { prefix: `${options.prefix}${key}.`, flattenArray: options.flattenArray }
         )
       );
