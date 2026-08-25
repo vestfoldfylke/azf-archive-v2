@@ -25,6 +25,11 @@ export type SIFCasesResponse = SIFBaseResponse & {
   Cases: SIFCase[];
 };
 
+/** ContactService / GetContactPersons */
+export type SIFGetContactPersonsResponse = SIFBaseResponse & {
+  ContactPersons: SIFContactPerson[];
+};
+
 /** ContactService / GetEnterprises */
 export type SIFGetEnterprisesResponse = SIFBaseResponse & {
   Enterprises: SIFEnterpriseResult[];
@@ -109,6 +114,11 @@ export type SIFCaseContact = {
   SubjectArea?: string;
 };
 
+export type SIFContactPerson = Omit<SIFPrivatePersonResult, "PersonalIdNumber" | "ExternalID"> & {
+  ExternalId: string;
+  Enterprise: string;
+};
+
 export type SIFEnterpriseResult = {
   Recno: number;
   EnterpriseNumber: number;
@@ -126,7 +136,6 @@ export type SIFEnterpriseResult = {
 export type SIFPrivatePersonResult = {
   Recno: number;
   FirstName: string;
-  MiddleName: string;
   LastName: string;
   PersonalIdNumber: string;
   ExternalID: string;

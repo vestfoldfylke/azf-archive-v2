@@ -28,7 +28,6 @@ const resultPrivatePerson: SIFPrivatePersonResult[] | SIFError = repacker<SIFPri
     {
       Recno: 123456,
       FirstName: "Roger",
-      MiddleName: null,
       LastName: "Hestefjes",
       PersonalIdNumber: "01010101010",
       ExternalID: "01010101010",

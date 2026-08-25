@@ -6,6 +6,10 @@ import { callFintfolk } from "../../lib/fintfolk.js";
 import HTTPError from "../../lib/http-error.js";
 import { httpResponse } from "../../lib/http-response.js";
 import { validateAndGetToken } from "../../lib/validate-and-get-token.js";
+import type { SyncElevmappeBody } from "../../types/elevmappe.js";
+import type { SyncEmployeeBody } from "../../types/employee.js";
+import type { FintEmployee } from "../../types/fint.js";
+import type { SyncPrivatePersonResponse } from "../../types/private-person.js";
 import { updateContext } from "../middleware/async-local-context.js";
 import { logContextHandling } from "../middleware/logcontext-handling.js";
 
@@ -20,12 +24,12 @@ const syncEmployeeHandler = async (request: HttpRequest, context: InvocationCont
   updateContext({ prefix: `SyncEmployee - clientId ${decoded.appid}${decoded.upn ? ` - ${decoded.upn}` : ""}`, contextId: context.invocationId });
   logger.info("Role validated");
 
-  let body: { ssn?: string; ansattnummer?: string; upn?: string; forceUpdate?: boolean; manualManagerEmail?: string };
+  let body: SyncEmployeeBody;
   try {
-    body = (await request.json()) as typeof body;
-  } catch {
+    body = (await request.json()) as SyncEmployeeBody;
+  } catch (error) {
     const msg = "Please pass a request body";
-    logger.error(msg);
+    logger.errorException(error, msg);
     return httpResponse(400, msg);
   }
   if (!body) {
@@ -34,7 +38,7 @@ const syncEmployeeHandler = async (request: HttpRequest, context: InvocationCont
     return httpResponse(400, msg);
   }
 
-  const { ssn, ansattnummer, upn, forceUpdate, manualManagerEmail } = body;
+  const { ssn, ansattnummer, upn, forceUpdate } = body;
 
   if (!ssn && !ansattnummer && !upn) {
     logger.info('Missing required parameter "ssn" or "ansattnummer" or "upn"');
@@ -53,10 +57,10 @@ const syncEmployeeHandler = async (request: HttpRequest, context: InvocationCont
     return httpResponse(400, 'WHAAT hit should we not arrive... Missing required parameter "ssn" or "ansattnummer" or "upn"');
   }
 
-  let fintfolkEmployee: { fodselsnummer?: string; [key: string]: unknown };
+  let fintfolkEmployee: FintEmployee;
   try {
     logger.info("Calling fintfolk");
-    fintfolkEmployee = (await callFintfolk(resourceUrl)) as typeof fintfolkEmployee;
+    fintfolkEmployee = (await callFintfolk(resourceUrl)) as FintEmployee;
     logger.info("Successfully got response from fintfolk");
   } catch (error) {
     if (error instanceof HTTPError) {
@@ -68,15 +72,17 @@ const syncEmployeeHandler = async (request: HttpRequest, context: InvocationCont
     return httpResponse(500, error);
   }
 
-  const syncPrivatePersonData = {
+  const syncPrivatePersonData: SyncElevmappeBody = {
     ssn: fintfolkEmployee.fodselsnummer,
     forceUpdate
   };
 
-  let privatePerson;
+  let privatePerson: SyncPrivatePersonResponse;
+
   try {
     logger.info("Syncing PrivatePerson");
     getOrThrowSyncPrivatePersonMethod(syncPrivatePersonData);
+
     privatePerson = await syncPrivatePerson(syncPrivatePersonData);
     logger.info("Successfully synced PrivatePerson");
   } catch (error) {
@@ -91,7 +97,7 @@ const syncEmployeeHandler = async (request: HttpRequest, context: InvocationCont
 
   try {
     logger.info("Syncing employee");
-    const { responsibleEnterprise, archiveManager } = await syncEmployee(privatePerson, fintfolkEmployee, manualManagerEmail);
+    const { responsibleEnterprise, archiveManager } = await syncEmployee(privatePerson, fintfolkEmployee);
     logger.info("Successfully synced employee");
     return httpResponse(200, { privatePerson, archiveManager, responsibleEnterprise });
   } catch (error) {
