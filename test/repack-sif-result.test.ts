@@ -328,8 +328,8 @@ test('CreateCase result with ErrorMessage has a "ErrorMessage" property', () => 
   assert.equal(resultCreateCaseWithErrorMessage.ErrorMessage, "Error occured in the mainframe :-O");
 });
 
-test('CreateCase result with ErrorMessage newline do not have "ErrorMessage" property', () => {
-  assert.equal("ErrorMessage" in resultCreateCaseWithWeirdErrorMessage, false);
+test('CreateCase result with ErrorMessage newline do have "ErrorMessage" property but do not have "hasError" property', () => {
+  assert.equal("ErrorMessage" in resultCreateCaseWithWeirdErrorMessage, true);
   assert.equal("hasError" in resultCreateCaseWithWeirdErrorMessage, false);
   assert.equal(resultCreateCaseWithWeirdErrorMessage.Recno, 123456);
   assert.equal(resultCreateCaseWithWeirdErrorMessage.CaseNumber, "40/12345");
