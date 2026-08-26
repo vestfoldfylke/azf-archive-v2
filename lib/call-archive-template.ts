@@ -1,3 +1,5 @@
+import path from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { logger } from "@vestfoldfylke/loglady";
 import { GENERATED_PDF_PROPERTY_NAME } from "../config.js";
 import type { CallArchiveTemplateInput } from "../types/archive.js";
@@ -6,6 +8,10 @@ import callArchive from "./call-archive.js";
 import generatePdf from "./generate-pdf.js";
 import HTTPError from "./http-error.js";
 import validateTemplateData from "./validate-templatedata.js";
+
+const moduleDir: string = path.dirname(fileURLToPath(import.meta.url));
+const systemAllowlist: RegExp = /^[a-z]+$/;
+const templateAllowlist: RegExp = /^[A-Za-zÅåØøÆæ0-9 _()-]+$/;
 
 type ArchivePayloadFileAttachment = {
   Base64Data: string;
@@ -127,9 +133,15 @@ const addContacts = (archivePayload: ArchivePayload, contacts: DocumentContact[]
 
 export default async (archiveData: CallArchiveTemplateInput): Promise<unknown> => {
   const { system, template, parameter, getExample, demoRun } = archiveData;
+  if (!systemAllowlist.test(system) || !templateAllowlist.test(template)) {
+    throw new HTTPError(400, `Could not find any template for system: "${system}" with name "${template}", are you sure it exists?`);
+  }
+
   let templateFile: Template;
   try {
-    templateFile = require(`../templates/${system}/${template}`);
+    const templatePath = path.resolve(moduleDir, "..", "templates", system, `${template}.js`);
+    const templateModule = (await import(pathToFileURL(templatePath).href)) as { default: Template };
+    templateFile = templateModule.default;
   } catch {
     throw new HTTPError(400, `Could not find any template for system: "${system}" with name "${template}", are you sure it exists?`);
   }
