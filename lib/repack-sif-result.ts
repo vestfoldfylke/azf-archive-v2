@@ -67,7 +67,7 @@ const filterSifResult = (result: unknown[], options: SIFOptions): unknown | unkn
     return filteredResult.slice(0, options.limit);
   }
 
-  return result;
+  return filteredResult;
 };
 
 export { filterSifResult, hasSifError, repackSifResult, repackUglySifError };
