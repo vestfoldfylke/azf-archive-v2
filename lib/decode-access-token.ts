@@ -34,7 +34,7 @@ export const decodeAccessToken = (token: string | null): DecodedAccessToken => {
   }
 
   const { upn, appid, roles } = decoded;
-  if (!upn || !appid) {
+  if (!upn && !appid) {
     result.msg = "Token is missing upn or appId";
     return result;
   }
