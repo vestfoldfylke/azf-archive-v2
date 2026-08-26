@@ -514,42 +514,6 @@ Fetches person info from [FINTFOLK-API](https://github.com/vtfk/azf-fintfolk-api
 }
 ```
 
-### ```POST /SyncSharePointSite```
-Endpoint for connecting a Sharepoint site to an archive-project, and a list || documentLibrary || folder to an archive-case
-
-The Sharepoint site is connected to an archive-projectNumber. The list || documentLibrary || folder is connected to an archive case through the archive-field **externalId**
-
-- Creates **Project** in archive if parameter `projectNumber` is not provided, or set to the string 'nei'.
-- Creates **Case** in archive if the Sharepoint-id of the list || documentLibrary || folder does not exist as externalId in archive - or fetches the caseNumber if it exists.
-- Does **not** update case or project metadata in archive. This is for avoiding conflicting changes if archivists change metadata directly in archive.
-- If project exists - new case will inherit responsible person from the project, even if you specify a different responsible person this in the payload. This is for avoiding conflicting changes if archivists change metadata directly in archive.
-- Returns metadata on **Project** and **Case** from archive
-
-
-#### `Example payload`
-```json5
-{
-  "siteUrl": "https://<domain>.sharepoint.com/sites/<site-name>",
-  "projectNumber": "{existing project number} || ${'nei'} || ${undefined}", // Undefined and 'nei' creates new project in archive
-  "projectTitle": "Something that describes the Sharepoint site",
-  "responsiblePersonEmail": "person@domain.com", // Must have access to archive - will throw error if user email is not found on a user in archive
-  "caseExternalId": "{siteUrl}-{type}-{guid}", // TODO: decide common structure - externalId MUST be unique
-  "caseTitle": "Something that describes the list || documentLibrary || folder",
-  "accessGroup": "Elev gul skole", // OPTIONAL. Defaults to "Alle"
-  "paragraph": "Offntl. 13.3" // OPTIONAL. Defaults to ""
-}
-```
-#### `Response`
-```json
-{
-  "msg": "Successfully synced SharePointSite",
-  "projectNumber": "24-1",
-  "projectTitle": "Bygging av nye fylkeskommuner",
-  "caseNumber": "22/00013",
-  "caseTitle": "Arkivering fra Sharepoint til P360"
-}
-```
-
 ## Templates
 All templates are found in [the templates folder](templates) 
 
