@@ -53,8 +53,9 @@ const syncElevmappe = async (privatePerson: SyncPrivatePersonResponse): Promise<
       updated ||
       firstElevmappe.Title !== "Elevmappe" ||
       firstElevmappe.UnofficialTitle !== `Elevmappe - ${firstName} ${lastName}` ||
-      (firstElevmappe.Contacts && firstElevmappe.Contacts.length > 0 && firstElevmappe.Contacts[0].Address.StreetAddress !== streetAddress) ||
-      false;
+      !firstElevmappe.Contacts ||
+      firstElevmappe.Contacts.length === 0 ||
+      firstElevmappe.Contacts[0].Address?.StreetAddress !== streetAddress;
 
     if (needsUpdate) {
       // PrivatePerson was updated or elevmappe was not correct, update elevmappe as well
