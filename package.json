@@ -38,13 +38,11 @@
     "@azure/functions": "^4.16.2",
     "@azure/msal-node": "^5.5.0",
     "@vestfoldfylke/loglady": "^2.1.0",
-    "jsonwebtoken": "^9.0.3",
     "node-cache": "^5.1.2",
     "vtfk-schools-info": "^3.4.2"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.9",
-    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.2.0",
     "typescript": "^7.0.2"
   }
