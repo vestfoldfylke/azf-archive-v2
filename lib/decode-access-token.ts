@@ -10,7 +10,11 @@ type JwtPayload = {
 const decodeJwt = (token: string): JwtPayload => {
   const base64Payload = token.replace("Bearer ", "").split(".")[1];
   const payload = Buffer.from(base64Payload, "base64url").toString();
-  return JSON.parse(payload) as JwtPayload;
+  const parsed = JSON.parse(payload);
+  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error("Payload is not a JSON object");
+  }
+  return parsed as JwtPayload;
 };
 
 export const decodeAccessToken = (token: string | null): DecodedAccessToken => {
@@ -27,21 +31,11 @@ export const decodeAccessToken = (token: string | null): DecodedAccessToken => {
     return result;
   }
 
-  let decoded: JwtPayload | string | null;
+  let decoded: JwtPayload;
   try {
     decoded = decodeJwt(token);
   } catch (_error) {
     result.msg = "Token is not a valid jwt";
-    return result;
-  }
-
-  if (!decoded) {
-    result.msg = "Token is not a valid jwt";
-    return result;
-  }
-
-  if (typeof decoded === "string") {
-    result.msg = "Token is just a plain string. Probably invalid 🤷‍♂️";
     return result;
   }
 
