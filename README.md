@@ -40,7 +40,7 @@ Optional fields:
 ```
 #### `Sending to "unregistered" - for manual archiving`
 Useful for when you do not have sufficient data for automatic archiving (e.g. foreign students not registered in DSF/folkeregister)
-```json
+```json5
 {
   "system": "archive",
   "template": "unregistered",
@@ -55,7 +55,7 @@ Useful for when you do not have sufficient data for automatic archiving (e.g. fo
 
 #### `With attachments and/or contacts, and demoRun, getExample and archive`
 
-```json
+```json5
 {
   "demoRun": true, // Optional
   "getExample": true, // Optional
@@ -92,7 +92,7 @@ Useful for when you do not have sufficient data for automatic archiving (e.g. fo
       {
         "orgnr": "12345678",
         "role": "Avsender"
-      }
+      },
       {
         "externalID": "78787",
         "role": "Avsender",
@@ -122,7 +122,7 @@ Endpoint for raw SIF calls
 Required fields:
 - `service`: Which ***SIF service*** to use
 - `method`: Which ***method*** from ***SIF service*** to use
-- `parameter`: Parameters for calling ***service.method***
+- `parameter`: Parameters for calling ***service\.method***
 
 
 Example
@@ -138,7 +138,7 @@ Example
 
 #### `Ping`
 
-All services have a Ping-method. Ping only returns status-code and no body.
+All services have a Ping-method. Ping only returns status-code without body.
 
 Example
 ```json
@@ -152,7 +152,7 @@ Returns 200 OK (if ok 🙃)
 
 #### Options
 Example
-```json
+```json5
 {
   "service": "CaseService",
   "method": "GetCases",
@@ -185,7 +185,7 @@ If needed, fetches person info from [Folkeregisteret](https://github.com/vestfol
 ```
 
 #### `With birthdate and name as parameter (only works with one match)`
-```json
+```json5
 {
   "birthdate": "2021-02-27", // YYYY-MM-DD
   "name": "Per Son", // Either name, or firstName and lastName
@@ -195,9 +195,9 @@ If needed, fetches person info from [Folkeregisteret](https://github.com/vestfol
 ```
 
 #### `With fakeSsn as parameter`
-Either uses the **PrivatePerson** with the provided data if person exists on the fake ssn AND the lastname of the existing 360-contact and the input-lastname matches, or creates new **PrivatePerson** with the provided data. The fake ssn is generated automatically based on the birthdate and gender. Address info is also required when using fake ssn. Fake ssn is generated in the following format: {birthdate (on the format {DD+40}MMYY)}{serial number}{gender (m = 1, f = 2)}{countyNumber}. E.g the example below will result in 67022199238 (if countyNumber is 38)
+Either uses the **PrivatePerson** with the provided data if person exists on the fake ssn AND the lastname of the existing 360-contact and the input-lastname matches, or creates new **PrivatePerson** with the provided data. The fake ssn is generated automatically based on the birthdate and gender. Address info is also required when using fake ssn. Fake ssn is generated in the following format: {birthdate (on the format {DD+40}MMYY)}{serial number}{gender (m = 1, f = 2)}{countyNumber}. E.g. the example below will result in 67022199238 (if countyNumber is 38)
 
-```json
+```json5
 {
   "fakeSsn": true,
   "birthdate": "2021-02-27", // YYYY-MM-DD
@@ -214,7 +214,7 @@ Either uses the **PrivatePerson** with the provided data if person exists on the
 ```
 #### `Optional: Use manually provided data instead of FREG data)`
 Either updates the **PrivatePerson** with FREG data if person exists on identifier, or creates new **PrivatePerson** with the provided data
-```json
+```json5
 {
   "ssn": "12345678910",
   "name": "Per Son", // Either name, or firstName and lastName
@@ -228,7 +228,7 @@ Either updates the **PrivatePerson** with FREG data if person exists on identifi
   "manualData": true
 }
 ```
-```json
+```json5
 {
   "birthdate": "2021-02-27", // YYYY-MM-DD
   "name": "Per Son", // Either name, or firstName and lastName
@@ -251,7 +251,7 @@ Either updates the **PrivatePerson** with FREG data and KRR data if person exist
   "forceUpdate": true
 }
 ```
-```json
+```json5
 {
   "birthdate": "2021-02-27", // YYYY-MM-DD
   "name": "Per Son", // Either name, or firstName and lastName
@@ -260,7 +260,7 @@ Either updates the **PrivatePerson** with FREG data and KRR data if person exist
   "forceUpdate": true
 }
 ```
-```json
+```json5
 {
   "birthdate": "2021-02-27", // YYYY-MM-DD
   "gender": "f", // "m" or "f"
@@ -275,7 +275,7 @@ Either updates the **PrivatePerson** with FREG data and KRR data if person exist
   "forceUpdate": true
 }
 ```
-```json
+```json5
 {
   "ssn": "12345678910",
   "name": "Per Son", // Either name, or firstName and lastName
@@ -290,7 +290,7 @@ Either updates the **PrivatePerson** with FREG data and KRR data if person exist
   "manualData": true
 }
 ```
-```json
+```json5
 {
   "birthdate": "2021-02-27", // YYYY-MM-DD
   "name": "Per Son", // Either name, or firstName and lastName
@@ -317,7 +317,7 @@ Either updates the **PrivatePerson** with FREG data and KRR data if person exist
 }
 ```
 
-Fetches company info from [Brønnøysundregisteret]https://www.brreg.no/)
+Fetches company info from [Brønnøysundregisteret](https://www.brreg.no/)
 
 
 ### ```POST /SyncElevmappe```
@@ -334,7 +334,7 @@ If needed, fetches person info from [Folkeregisteret](https://github.com/vestfol
 ```
 
 #### `With birthdate and name as parameter (only works with one match)`
-```json
+```json5
 {
   "birthdate": "2021-02-27", // YYYY-MM-DD
   "name": "Per Son", // Either name, or firstName and lastName
@@ -344,9 +344,9 @@ If needed, fetches person info from [Folkeregisteret](https://github.com/vestfol
 ```
 
 #### `With fakeSsn as parameter`
-Either uses the **PrivatePerson** with the provided data if person exists on the fake ssn AND the lastname of the existing 360-contact and the input-lastname matches, or creates new **PrivatePerson** with the provided data. The fake ssn is generated automatically based on the birthdate and gender. Address info is also required when using fake ssn. Fake ssn is generated in the following format: {birthdate (on the format {DD+40}MMYY)}{serial number}{gender (m = 1, f = 2)}{countyNumber}. E.g the example below will result in 67022199238 (if countyNumber is 38)
+Either uses the **PrivatePerson** with the provided data if person exists on the fake ssn AND the lastname of the existing 360-contact and the input-lastname matches, or creates new **PrivatePerson** with the provided data. The fake ssn is generated automatically based on the birthdate and gender. Address info is also required when using fake ssn. Fake ssn is generated in the following format: {birthdate (on the format {DD+40}MMYY)}{serial number}{gender (m = 1, f = 2)}{countyNumber}. E.g. the example below will result in 67022199238 (if countyNumber is 38)
 
-```json
+```json5
 {
   "fakeSsn": true,
   "birthdate": "2021-02-27", // YYYY-MM-DD
@@ -363,7 +363,7 @@ Either uses the **PrivatePerson** with the provided data if person exists on the
 ```
 #### `Optional: Use manually provided data instead of FREG data)`
 Either updates the **PrivatePerson** with FREG data if person exists on identifier, or creates new **PrivatePerson** with the provided data
-```json
+```json5
 {
   "ssn": "12345678910",
   "name": "Per Son", // Either name, or firstName and lastName
@@ -377,7 +377,7 @@ Either updates the **PrivatePerson** with FREG data if person exists on identifi
   "manualData": true
 }
 ```
-```json
+```json5
 {
   "birthdate": "2021-02-27", // YYYY-MM-DD
   "name": "Per Son", // Either name, or firstName and lastName
@@ -400,7 +400,7 @@ Either updates the **PrivatePerson** with FREG data if person exists on identifi
   "forceUpdate": true
 }
 ```
-```json
+```json5
 {
   "birthdate": "2021-02-27", // YYYY-MM-DD
   "name": "Per Son", // Either name, or firstName and lastName
@@ -409,7 +409,7 @@ Either updates the **PrivatePerson** with FREG data if person exists on identifi
   "forceUpdate": true
 }
 ```
-```json
+```json5
 {
   "birthdate": "2021-02-27", // YYYY-MM-DD
   "gender": "f", // "m" or "f"
@@ -424,7 +424,7 @@ Either updates the **PrivatePerson** with FREG data if person exists on identifi
   "forceUpdate": true
 }
 ```
-```json
+```json5
 {
   "ssn": "12345678910",
   "name": "Per Son", // Either name, or firstName and lastName
@@ -439,7 +439,7 @@ Either updates the **PrivatePerson** with FREG data if person exists on identifi
   "manualData": true
 }
 ```
-```json
+```json5
 {
   "birthdate": "2021-02-27", // YYYY-MM-DD
   "name": "Per Son", // Either name, or firstName and lastName
@@ -514,44 +514,8 @@ Fetches person info from [FINTFOLK-API](https://github.com/vtfk/azf-fintfolk-api
 }
 ```
 
-### ```POST /SyncSharePointSite```
-Endpoint for connecting a Sharepoint site to a archive-project, and a list || documentLibrary || folder to a archive-case
-
-The Sharepoint site is connected to a archive-projectNumber. The list || documentLibrary || folder is connected to a archive case through the archive-field **externalId**
-
-- Creates **Project** in archive if parameter `projectNumber` is not provided, or set to the string 'nei'.
-- Creates **Case** in archive if the Sharepoint-id of the list || documentLibrary || folder does not exist as externalId in archive - or fetches the caseNumber if it exists.
-- Does **not** update case or project metadata in archive. This is for avoiding conflicting changes if archivists change metadata directly in archive.
-- If project exists - new case will inherit responsible person from the project, even if you specify a different responsible person this in the payload. This is for avoiding conflicting changes if archivists change metadata directly in archive.
-- Returns metadata on **Project** and **Case** from archive
-
-
-#### `Example payload`
-```json
-{
-  "siteUrl": "https://<domain>.sharepoint.com/sites/<site-name>",
-  "projectNumber": "{existing project number} || ${'nei'} || ${undefined}", // Undefined and 'nei' creates new project in archive
-  "projectTitle": "Something that describes the Sharepoint site",
-  "responsiblePersonEmail": "person@domain.com", // Must have access to archive - will throw error if user email is not found on a user in archive
-  "caseExternalId": "{siteUrl}-{type}-{guid}", // TODO: decide common structure - externalId MUST be unique
-  "caseTitle": "Something that describes the list || documentLibrary || folder",
-  "accessGroup": "Elev gul skole", // OPTIONAL. Defaults to "Alle"
-  "paragraph": "Offntl. 13.3" // OPTIONAL. Defaults to ""
-}
-```
-#### `Response`
-```json
-{
-  "msg": "Succesfully synced SharePointSite",
-  "projectNumber": "24-1",
-  "projectTitle": "Bygging av nye fylkeskommuner",
-  "caseNumber": "22/00013",
-  "caseTitle": "Arkivering fra Sharepoint til P360"
-}
-```
-
 ## Templates
-All templates are found in [the templates folder](./templates/) 
+All templates are found in [the templates folder](templates) 
 
 
 ## local.settings.json
@@ -562,7 +526,6 @@ All templates are found in [the templates folder](./templates/)
     "Values": {
       "AzureWebJobsStorage": "",
       "FUNCTIONS_WORKER_RUNTIME": "node",
-      "ALLOW_LEGACY_RENEGOTIATION": false,
       "ARCHIVE_ROLE": "Archive",
       "ARCHIVE_URL": "sif rpc url",
       "ARCHIVE_CLIENT_ID": "sif client id",
@@ -601,7 +564,7 @@ All templates are found in [the templates folder](./templates/)
 
 ### Azure
 
-You'll need a valid subscription and to setup the following resources
+You'll need a valid subscription to set up the following resources
 
 - resource group
 - app service plan
@@ -616,7 +579,7 @@ Install all tools needed for [local development](https://docs.microsoft.com/en-u
 
 Clone the repo. Install dependencies (```npm install```)
 
-Create a [local.settings.json](#local.settings.json) file
+Create a [local.settings.json](#localsettingsjson) file
 
 Start server
 

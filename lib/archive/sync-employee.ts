@@ -1,0 +1,205 @@
+import { logger } from "@vestfoldfylke/loglady";
+import { DEV_SYNCEMPLOYEE_MANAGER, MAIL } from "../../config.js";
+import type { ContactPersonRepacked, ResponsibleEnterpriseRepacked, SyncEmployeeResponse } from "../../types/employee.js";
+import type { FintArbeidsforhold, FintEmployee, FintStrukturLinje } from "../../types/fint.js";
+import type { SyncPrivatePersonResponse } from "../../types/private-person.js";
+import type { SIFContactPerson, SIFEnterpriseResult, SIFGetContactPersonsResponse, SIFGetEnterprisesResponse } from "../../types/sif.js";
+import callArchive from "../call-archive.js";
+import HTTPError from "../http-error.js";
+import sendmail from "../send-mail.js";
+
+const { toArchiveAdministrator } = MAIL;
+
+const repackManager = (archiveManager: SIFContactPerson): ContactPersonRepacked => {
+  if (!archiveManager.Recno) {
+    throw new Error("archiveManager ContactPerson does not have Recno - something is very wrong...");
+  }
+
+  return {
+    recno: archiveManager.Recno,
+    email: archiveManager.Email,
+    name: `${archiveManager.FirstName} ${archiveManager.LastName}`
+  };
+};
+
+const repackEnterprise = (responsibleEnterprise: SIFEnterpriseResult): ResponsibleEnterpriseRepacked => {
+  if (!responsibleEnterprise.Recno) {
+    throw new Error("ResponsibleEnterprise does not have Recno - something is very wrong...");
+  }
+
+  return {
+    recno: responsibleEnterprise.Recno,
+    externalId: responsibleEnterprise.ExternalID,
+    shortName: responsibleEnterprise.Initials,
+    name: responsibleEnterprise.Name
+  };
+};
+
+const syncEmployee = async (privatePerson: SyncPrivatePersonResponse, fintfolkEmployee: FintEmployee): Promise<SyncEmployeeResponse> => {
+  const { ssn } = privatePerson;
+  if (!ssn) {
+    logger.error('Missing required parameter "privatePerson.ssn"');
+    throw new HTTPError(400, 'Missing required parameter "privatePerson.ssn"');
+  }
+
+  // Need to get p360 enterprise and leaderEmail
+  // Find unit and index / level for narmesteleder
+
+  // First find mainposition or first active position
+  let mainPosition: FintArbeidsforhold | undefined = fintfolkEmployee.arbeidsforhold.find((forhold: FintArbeidsforhold) => forhold.aktiv && forhold.hovedstilling);
+  if (!mainPosition) {
+    mainPosition = fintfolkEmployee.arbeidsforhold.find((forhold: FintArbeidsforhold) => forhold.aktiv && forhold.lonnsprosent > 0); // First one aktiv and with some lonn
+  }
+  if (!mainPosition) {
+    mainPosition = fintfolkEmployee.arbeidsforhold.find((forhold: FintArbeidsforhold) => forhold.aktiv); // Aktiv at least..
+  }
+  if (!mainPosition) {
+    throw new HTTPError(500, `No valid arbeidsforhold found for employee ${fintfolkEmployee.ansattnummer}. Cannot continue`);
+  }
+
+  let responsibleEnterprise: SIFEnterpriseResult | null = null;
+  let archiveManager: SIFContactPerson | null = null;
+  let mainResponsibleUnit: FintStrukturLinje | null = null;
+  let level: number = mainPosition.strukturlinje.length;
+  let movedUp: boolean = false;
+  let movedUpTimes: number = 0;
+
+  for (const unit of mainPosition.strukturlinje) {
+    // Check if unit has a leader in FINT
+    if (!unit.leder?.ansattnummer) {
+      logger.warn("No manager found in FINT for unit {Unit}, going up one level", unit.kortnavn || unit.navn);
+      level--;
+      movedUp = true;
+      movedUpTimes++;
+      continue;
+    }
+
+    // If we are in p360 test - leaders usually don't have user, so we override if we need to
+    if (DEV_SYNCEMPLOYEE_MANAGER) {
+      logger.info("DEV_SYNCEMPLOYEE_MANAGER is set in local.settings - will override manager kontaktEpostadresse with value from local.settings");
+      unit.leder.kontaktEpostadresse = DEV_SYNCEMPLOYEE_MANAGER;
+    }
+
+    // If we have unit with leader, check if leader is leader in first one
+    if (unit.leder.ansattnummer === fintfolkEmployee.ansattnummer) {
+      level--; // We move up one level, but not set movedUp to true - vi kan jo ikke velge en enhet der ansatt også er leder lisssom
+      continue;
+    }
+
+    if (movedUp && movedUpTimes > 2) {
+      // We do not want to go up more than 2 levels (sjefen til sjefen)
+      logger.warn("We have moved up in the structure, and are above seksjon - we will not go further");
+      break;
+    }
+
+    if (!mainResponsibleUnit) {
+      mainResponsibleUnit = unit;
+    }
+
+    // Get enterprise from archive
+    let enterpriseMatch: boolean = false;
+    let enterpriseMatches: SIFGetEnterprisesResponse["Enterprises"] = (await callArchive({
+      service: "ContactService",
+      method: "GetEnterprises",
+      parameter: { ExternalID: unit.organisasjonsKode, Active: true, Categories: ["Intern"] }
+    })) as SIFGetEnterprisesResponse["Enterprises"];
+
+    if (enterpriseMatches.length === 1) {
+      logger.info("Found match for enterprise with ExternalID {OrganisasjonsKode}", unit.organisasjonsKode);
+      enterpriseMatch = true;
+    }
+
+    if (!enterpriseMatch && unit.kortnavn) {
+      // If not found, trying with shortcode
+      logger.info("No unique match for enterprise with ExternalID {OrganisasjonsKode}, trying with shortcode", unit.organisasjonsKode);
+      enterpriseMatches = (await callArchive({
+        service: "ContactService",
+        method: "GetEnterprises",
+        parameter: { Initials: unit.kortnavn, Active: true, Categories: ["Intern"] }
+      })) as SIFGetEnterprisesResponse["Enterprises"];
+      if (enterpriseMatches.length === 1) {
+        logger.info("Found match for enterprise with shortcode {Kortnavn}", unit.kortnavn);
+        enterpriseMatch = true;
+      }
+    }
+
+    if (!enterpriseMatch) {
+      logger.info("Could not find enterpriseMatch for unit {Unit}, trying one level up", unit.kortnavn || unit.navn);
+      level--; // we move up in the structure
+      movedUp = true;
+      movedUpTimes++;
+      continue;
+    }
+
+    // Here we have enterpriseMatch and we can try to find manager as well
+    let managerMatch: boolean = false;
+    const managerMatches: SIFGetContactPersonsResponse["ContactPersons"] = (await callArchive({
+      service: "ContactService",
+      method: "GetContactPersons",
+      parameter: { email: unit.leder.kontaktEpostadresse, Active: true, Categories: ["Intern"] }
+    })) as SIFGetContactPersonsResponse["ContactPersons"];
+
+    if (managerMatches.length === 1) {
+      logger.info("Found ContactPerson for manager (ansattnummer) {Ansattnummer} in unit {Unit} - great success", unit.leder.ansattnummer, unit.kortnavn || unit.navn);
+      managerMatch = true;
+    }
+
+    if (enterpriseMatch && managerMatch) {
+      logger.info("Wihoo found both enterprise and manager in archive for unit {Unit} - great success", unit.kortnavn || unit.navn);
+      responsibleEnterprise = enterpriseMatches[0];
+      archiveManager = managerMatches[0];
+      break;
+    }
+
+    logger.info("Could not find manager in P360 for unit {Unit}, trying one level up", unit.kortnavn || unit.navn);
+    level--; // we move up in the structure
+    movedUp = true;
+    movedUpTimes++;
+  }
+
+  if (!responsibleEnterprise || !archiveManager) {
+    throw new Error(`Could not find manager and responsibleEnterprise for employee ${fintfolkEmployee.kontaktEpostadresse}`);
+  }
+
+  const responsibleEnterpriseRepacked: ResponsibleEnterpriseRepacked = repackEnterprise(responsibleEnterprise);
+  const archiveManagerRepacked: ContactPersonRepacked = repackManager(archiveManager);
+
+  if (movedUp) {
+    // Send e-post til arkivet om at vi måtte bevege oss et steg opp
+    const mailBody = `
+Hei!<br><br>Arkiveringsroboten fant ikke match i P360 på virksomhet og leder for ansatt (privatperson) med recno: <strong>${privatePerson.recno}</strong>.
+<br>
+<i>Merk at roboten kan ha funnet korrekt intern virksomhet i P360, men ikke funnet lederen som kontaktperson i P360, så om virksomheten ser ok ut, mangler det nok kontaktperson for lederen (eller feil e-postadresse på kontaktpersonen)</i>
+<br>
+<br>
+Enhet der ansatt jobber: <strong>${mainResponsibleUnit?.navn || "mangler navn"} (${mainResponsibleUnit?.kortnavn || "mangler kortnavn"})</strong> (fra HR)
+<br>
+Nærmeste leder for ansatt: <strong>${mainResponsibleUnit?.leder.kontaktEpostadresse || "mangler kontaktEpostadersse"}</strong> (fra HR)
+<br>
+<br>
+Siden vi ikke fant virksomhet/leder i P360 gikk roboten <strong>${mainPosition.strukturlinje.length - level}</strong> nivå opp i organisasjonsstrukturen, for der fant den match i P360 👍
+<br>
+Virksomhet som roboten brukte som ansvarlig (recno i parentes): <strong>${responsibleEnterpriseRepacked.name} (${responsibleEnterpriseRepacked.recno})</strong> (fra P360)
+<br>
+Leder (intern kontaktperson) som roboten brukte som ansvarlig (recno i parentes): <strong>${archiveManagerRepacked.email} (${archiveManagerRepacked.recno})</strong>
+<br>
+<br>
+Kan dere sjekke om dette er korrekt, evt fikse slik at det blir riktig? (Sjekk gjerne om det er saker / dokumenter som må rettes opp på ansatt med recno <strong>${privatePerson.recno}</strong>)
+<br>
+<br>
+Ha en fortyllende dag 🪄
+`;
+    await sendmail({
+      to: toArchiveAdministrator,
+      subject: "Arkiveringsroboten klarte ikke finne korrekt leder / virksomhet for ansatt",
+      body: mailBody
+    });
+  }
+
+  return {
+    responsibleEnterprise: responsibleEnterpriseRepacked,
+    archiveManager: archiveManagerRepacked
+  };
+};
+
+export { syncEmployee };

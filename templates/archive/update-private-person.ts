@@ -1,0 +1,33 @@
+import type { ArchivePayload, Template, TemplateData } from "../../types/template.js";
+
+const template: Template = {
+  archiveTemplate: (archiveData: TemplateData): ArchivePayload => {
+    return {
+      service: "ContactService",
+      method: "UpdatePrivatePerson",
+      parameter: {
+        Recno: archiveData.recno,
+        FirstName: archiveData.firstName,
+        LastName: archiveData.lastName,
+        PrivateAddress: {
+          StreetAddress: archiveData.streetAddress,
+          ZipCode: archiveData.zipCode,
+          ZipPlace: archiveData.zipPlace,
+          Country: "NOR"
+        },
+        Email: archiveData.email,
+        PhoneNumber: archiveData.phoneNumber
+      }
+    };
+  },
+  requiredFields: {
+    recno: 12345,
+    firstName: "Ola",
+    lastName: "Nordmann",
+    streetAddress: "Fiktivveien 42",
+    zipCode: "4242",
+    zipPlace: "Fiktiviteten"
+  }
+};
+
+export default template;
