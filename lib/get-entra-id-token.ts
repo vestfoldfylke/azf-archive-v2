@@ -28,7 +28,7 @@ async function getToken(scope: string): Promise<string> {
   }
 
   if (!result.expiresOn) {
-    throw new Error("getEntraIdToken - Got new token, but no expiration, that cant be right...");
+    throw new Error("getEntraIdToken - Got new token, but no expiration, that can't be right...");
   }
 
   const expires: number = Math.floor((result.expiresOn.getTime() - Date.now()) / 1000);
