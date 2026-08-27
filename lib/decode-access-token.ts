@@ -1,17 +1,17 @@
 import type { DecodedAccessToken } from "../types/auth.js";
 
 type JwtPayload = {
-  upn: string | undefined
-  appid: string | undefined
-  roles: string[] | undefined
-}
+  upn: string | undefined;
+  appid: string | undefined;
+  roles: string[] | undefined;
+};
 
 // We only decode, as built in entra auth verifies. Decode only for metadata - not authentication.
 const decodeJwt = (token: string): JwtPayload => {
-  const base64Payload = token.replace("Bearer ", "").split(".")[1]
-  const payload = Buffer.from(base64Payload, "base64url").toString()
-  return JSON.parse(payload) as JwtPayload
-}
+  const base64Payload = token.replace("Bearer ", "").split(".")[1];
+  const payload = Buffer.from(base64Payload, "base64url").toString();
+  return JSON.parse(payload) as JwtPayload;
+};
 
 export const decodeAccessToken = (token: string | null): DecodedAccessToken => {
   const result: DecodedAccessToken = {
